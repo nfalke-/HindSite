@@ -65,6 +65,7 @@ class Navigator(object):
         return Image.open(BytesIO(self.browser.get_screenshot_as_png()))
 
     def _add_slide_to_video(self):
+        #TODO: figure out how to make videos and replace this with that
         self.video_frames.append(self._take_partial_screenshot())
 
     def _visit(self, url):
@@ -99,10 +100,11 @@ class Navigator(object):
     def run(self):
         for task in self.task_list:
             self._do_task(task)
+        #TODO: correct file storage instead of this crap
         for i, frame in enumerate(self.video_frames):
             frame.save('frame{}.png'.format(i))
         for i, screenshot in enumerate(self.full_screenshots):
-            b = Image.open('full_screenshot{}.png'.format(i))
-            self._diff_screenshots(screenshot, b).save('diff{}.png'.format(i))
+            #b = Image.open('full_screenshot{}.png'.format(i))
+            #self._diff_screenshots(screenshot, b).save('diff{}.png'.format(i))
             screenshot.save('full_screenshot{}.png'.format(i))
 
