@@ -1,8 +1,8 @@
 import MySQLdb
+from config import db_auth
 
 def get_from_db(query, args=()):
-    db= MySQLdb.connect(host="localhost", user="diffmaster",
-                        passwd="hunter2", db="sitediff")
+    db= MySQLdb.connect(**db_auth)
     cursor = db.cursor()
     if not isinstance(args, tuple):
         args = (args, )
@@ -13,8 +13,7 @@ def get_from_db(query, args=()):
     return ()
 
 def write_to_db(query, args=()):
-    db= MySQLdb.connect(host="localhost", user="diffmaster",
-                        passwd="hunter2", db="sitediff")
+    db= MySQLdb.connect(**db_auth)
     cursor = db.cursor()
     if not isinstance(args, tuple):
         args = (args, )
@@ -23,8 +22,7 @@ def write_to_db(query, args=()):
     return
 
 def write_many_to_db(query, args=()):
-    db= MySQLdb.connect(host="localhost", user="diffmaster",
-                        passwd="hunter2", db="sitediff")
+    db= MySQLdb.connect(**db_auth)
     cursor = db.cursor()
     if not isinstance(args, tuple):
         args = (args, )
