@@ -1,0 +1,23 @@
+<body bgcolor="#D0D0D0">
+    <center>
+        <table border="1">
+            {% if steps %}
+                <a href="/tests/run/{{testid}}">run test</a>
+            {% endif %}
+                <thead>
+                    <tr>
+                        <td>Action</td>
+                        <td>Arguments</td>
+                    </tr>
+                </thead>
+            {% for action, args in steps %}
+                <tbody>
+                    <tr>
+                    <td>{{ action }}</td>
+                    <td>{{ args }}</td>
+                    </tr>
+                </tbody>
+            {% endfor %}
+        </table>
+    </center>
+</body>

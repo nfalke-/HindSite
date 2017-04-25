@@ -1,0 +1,38 @@
+<head>
+</head>
+<body bgcolor="#D0D0D0">
+    <center>
+        <div id="StepTableDiv">
+            <form method=post enctype=multipart/form-data>
+                <table id="StepTable" border="1">
+                    <thead>
+                        <tr>
+                            <td>Step Number</td>
+                            <td>Action</td>
+                            <td>Arguments</td>
+                            <td>Add Row Below</td>
+                            <td>Delete</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stepnumber, action, args in steps %}
+                            <tr>
+                                <td>{{stepnumber}}</td>
+                                <td><input size=10 type="text" name="action" id="action"
+                                           placeholder="action" value="{{action}}"/></td>
+                                <td><input size=40 type="text" name="args" id="args"
+                                           placeholder="arguments" value="{{args}}"/></td>
+                                <td><input type="button" id="AddRowButton"
+                                           value="New Row Below" onclick="insRow(this)"/></td>
+                                <td><input type="button" id="DelRowButton"
+                                           value="Delete" onclick="deleteRow(this)"/></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <input type=submit value=Submit>
+            </form>
+        </div>
+    </center>
+    <script src="/static/addrows.js"></script>
+</body>
