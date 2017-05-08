@@ -3,7 +3,7 @@
 <body bgcolor="#D0D0D0">
     <center>
         <div id="StepTableDiv">
-            <form method=post enctype=multipart/form-data>
+            <form method=post enctype=multipart/form-data onsubmit="activateAll()">
                 <table id="StepTable" border="1">
                     <thead>
                         <tr>
@@ -12,6 +12,7 @@
                             <td>Arguments</td>
                             <td>Take Screenshot</td>
                             <td>Screenshot Name</td>
+                            <td>Threshold</td>
                             <td>Add Row Below</td>
                             <td>Delete</td>
                         </tr>
@@ -20,8 +21,13 @@
                         {% for stepnumber, action, args, screenshot, screenshot_name, threshold in steps %}
                             <tr>
                                 <td>{{stepnumber}}</td>
-                                <td><input size=10 type="text" name="action"
-                                           placeholder="action" value="{{action}}"/></td>
+                                <td>
+                                    <select name="action">
+                                        <option value="visit">Visit</option>
+                                        <option value="click" {% if action == 'click' %} selected {% endif %} >Click</option>
+                                        <option value="input" {% if action == 'input' %} selected {% endif %} >Input</option>
+                                    </select>
+                                </td>
                                 <td><input size=40 type="text" name="arguments"
                                            placeholder="arguments" value="{{args}}"/></td>
                                 <td><input type="checkbox" name="screenshot"
@@ -39,9 +45,9 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <input type=submit value=Submit>
+                <input type=submit value=Submit >
             </form>
         </div>
-    </center>
     <script src="/static/addrows.js"></script>
+    </center>
 </body>
