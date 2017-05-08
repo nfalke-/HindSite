@@ -1,0 +1,25 @@
+<body bgcolor="#D0D0D0">
+    <center>
+        <a href='/suites/{{suiteid}}/tests/add'>New Test</a><p>
+        <table border="1">
+            <thead>
+                <tr>
+                    <td>tests</td>
+                    <td>passed</td>
+                    <td>screenshot passed</td>
+                    <td>last ran</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for testname, testid, passed, screenshot_passed, last_ran in tests %}
+                    <tr>
+                        <td><a href='/suites/{{suiteid}}/tests/{{testid}}'>{{ testname }}</a></td>
+                        <td>{{passed}}</td>
+                        <td>{{screenshot_passed}}</td>
+                        <td>{{last_ran}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </center>
+</body>

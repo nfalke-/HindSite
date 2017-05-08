@@ -1,0 +1,71 @@
+<head>
+    <script>
+        function runTest(suiteid, testid) {
+            var http = new XMLHttpRequest();
+            http.open(
+                "GET",
+                "/suites/" + suiteid +
+                "/tests/" + testid +
+                "/run/",
+                true);
+            http.send( null )
+        }
+    </script>
+</head>
+
+<body bgcolor="#D0D0D0">
+    <center>
+        <table border="1">
+            {% if steps %}
+                <input type="button", value='run test' onclick="runTest(
+                    '{{suiteid}}', '{{testid}}'
+                )"><br>
+            {% endif %}
+            <a href="/suites/{{suiteid}}/tests/{{testid}}/edit/">edit test</a>
+
+
+            <thead>
+                <tr>
+                    <td>Action</td>
+                    <td>Arguments</td>
+                    <td>Take Screenshot</td>
+                    <td>Diff Threshold</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for action, args, screenshot, screenshot_name, threshold in steps %}
+                    <tr>
+                        <td>{{ action }}</td>
+                        <td>{{ args }}</td>
+                        <td>{{ screenshot }}</td>
+                        <td>{{ threshold }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <H3>Previous Runs</H3>
+        <table border="1">
+            <thead>
+                <tr>
+                    <td>run_id</td>
+                    <td>start</td>
+                    <td>end</td>
+                    <td>passed</td>
+                    <td>screenshot_passed</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for runid, start_time, end_time, passed, screenshot_passed in runs %}
+                    <tr>
+                        <td><a href=/suites/{{suiteid}}/tests/{{testid}}/runs/{{ runid }} >{{ runid }}</a></td>
+                        <td>{{ start_time }}</td>
+                        <td>{{ end_time }}</td>
+                        <td>{{ passed }}</td>
+                        <td>{{ screenshot_passed }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </center>
+</body>

@@ -10,18 +10,27 @@
                             <td>Step Number</td>
                             <td>Action</td>
                             <td>Arguments</td>
+                            <td>Take Screenshot</td>
+                            <td>Screenshot Name</td>
                             <td>Add Row Below</td>
                             <td>Delete</td>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for stepnumber, action, args in steps %}
+                        {% for stepnumber, action, args, screenshot, screenshot_name, threshold in steps %}
                             <tr>
                                 <td>{{stepnumber}}</td>
-                                <td><input size=10 type="text" name="action" id="action"
+                                <td><input size=10 type="text" name="action"
                                            placeholder="action" value="{{action}}"/></td>
-                                <td><input size=40 type="text" name="args" id="args"
+                                <td><input size=40 type="text" name="arguments"
                                            placeholder="arguments" value="{{args}}"/></td>
+                                <td><input type="checkbox" name="screenshot"
+                                           {% if screenshot %} checked {% endif %}
+                                           value="{{stepnumber}}" /></td>
+                                <td><input size=40 type="text" name="screenshot_name"
+                                           placeholder="screenshot name" value="{{screenshot_name}}"/></td>
+                                <td><input size=40 type="text" name="threshold"
+                                           placeholder="diff threshold" value="{{threshold}}"/></td>
                                 <td><input type="button" id="AddRowButton"
                                            value="New Row Below" onclick="insRow(this)"/></td>
                                 <td><input type="button" id="DelRowButton"
