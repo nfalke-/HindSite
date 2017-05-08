@@ -1,4 +1,5 @@
 import time
+import traceback
 import os
 import io
 from selenium import webdriver
@@ -36,6 +37,7 @@ class Navigator(object):
         else:
             browser = BROWSERS[browser.lower()]()
 
+        self.last_clicked_on = None
         self.browser = browser
         self.browser.set_window_size(WIDTH, HEIGHT)
         self.browser.set_window_position(0, 0)
@@ -43,6 +45,7 @@ class Navigator(object):
             'visit': self._visit,
             'click': self._click,
             'import': self._import,
+            'insert': self._insert,
         }
         makedir(self.directory)
         makedir(self.baseline)
@@ -131,6 +134,7 @@ class Navigator(object):
 
     def _click(self, css_selector):
         element = self.browser.find_element_by_css_selector(css_selector)
+        self.last_clicked_on = element
         self.video.resume()
         self._highlight(element)
         self.video.pause()
@@ -139,6 +143,10 @@ class Navigator(object):
         self.video.resume()
         time.sleep(2)
         self.video.pause()
+
+    def _insert(self, text):
+        if self.last_clicked_on:
+            self.last_clicked_on.send_keys(text)
 
     def _save_and_diff(self, screenshot_name):
         screenshot = self._take_fullpage_screenshot()
@@ -159,6 +167,7 @@ class Navigator(object):
         try:
             self.commands[task.action](task.args)
         except:
+            traceback.print_exc()
             self.step_passed = False
             if True:
                 self.test_passed = False
