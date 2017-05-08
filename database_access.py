@@ -56,7 +56,7 @@ def get_steps_for_test(testid):
 def list_suites():
     query = '''
     select
-        suitename, suiteid
+        suitename, suiteid, browser
     from
         suites
     '''
@@ -82,12 +82,12 @@ def add_steps_to_test(testid, steps):
     steps = tuple((testid, stepnumber)+tuple(i for i in step) for stepnumber, step in enumerate(steps, 1))
     write_many_to_db(query, steps)
 
-def add_suite(name):
+def add_suite(name, browser):
     query = """insert into
-        suites (suitename)
+        suites (suitename, browser)
     values
-        (%s)"""
-    write_to_db(query, name)
+        (%s, %s)"""
+    write_to_db(query, (name, browser))
 
 def add_test(suiteid, name):
     query = """insert into
@@ -174,4 +174,14 @@ def get_most_recent_run_state(testid):
     '''
     return get_from_db(query, (testid))
 
+def get_browser_for_suite(suiteid):
+    query = '''
+    select
+        browser
+    from
+        suites
+    where
+        suiteid = %s
+    '''
+    return get_from_db(query, (suiteid))
 

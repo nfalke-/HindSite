@@ -5,6 +5,7 @@
             <thead>
                 <tr>
                     <td>Suite</td>
+                    <td>Browser</td>
                     <td>Last ran</td>
                     <td>Description</td>
                     <td>Tests</td>
@@ -12,9 +13,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for suitename, suiteid in suites %}
+                {% for suitename, suiteid, browser in suites %}
                     <tr>
                         <td><a href='/suites/{{suiteid}}'>{{ suitename }}</a></td>
+                        <td>{{ browser }}</td>
                         <td>{{ lastran }}</td>
                         <td>{{ description }}</td>
                         <td>{{ tests }}</td>

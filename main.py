@@ -45,7 +45,9 @@ def view_run(suite_id, test_id, run_id):
 def add_suite():
     if request.method == 'POST':
         if request.form.get('suitename'):
-            database_access.add_suite(request.form.get('suitename'))
+            name = request.form.get('suitename')
+            browser = request.form.get('browser')
+            database_access.add_suite(name, browser)
             return redirect(url_for('index'))
     return render_template('add/suite.html')
 
@@ -82,7 +84,8 @@ def edit_test(suite_id, test_id):
 #run
 @app.route('/suites/<suite_id>/tests/<test_id>/run/', methods=['GET', 'POST'])
 def run_test(suite_id, test_id):
-    n = Navigator(test_id)
+    browser = database_access.get_browser_for_suite(suite_id)[0][0]
+    n = Navigator(test_id, browser=browser)
     Process(target=n.run).start()
     return redirect(url_for('view_test', suite_id=suite_id, test_id=test_id))
 
