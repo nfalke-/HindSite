@@ -1,6 +1,25 @@
+<head>
+    <script>
+        function runTest(suiteid, testid) {
+            var http = new XMLHttpRequest();
+            http.open(
+                "GET",
+                "/suites/" + suiteid +
+                "/run/",
+                true);
+            http.send( null )
+        }
+    </script>
+</head>
+
 <body bgcolor="#D0D0D0">
     <center>
-        <a href='/suites/{{suiteid}}/tests/add'>New Test</a><p>
+        <a href='/suites/{{suiteid}}/tests/add'>New Test</a><br>
+        {% if tests %}
+            <input type="button", value='run suite' onclick="runTest(
+                '{{suiteid}}'
+            )"><br>
+        {% endif %}
         <table border="1">
             <thead>
                 <tr>

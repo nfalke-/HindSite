@@ -14,7 +14,7 @@ def index():
     suites = database_access.list_suites()
     return render_template('view/root.html', suites=suites)
 
-@app.route('/suites/<suite_id>', methods=['GET', 'POST'])
+@app.route('/suites/<suite_id>/', methods=['GET', 'POST'])
 def view_suite(suite_id):
     test_base_info = database_access.list_tests(suite_id)
     tests = []
@@ -27,7 +27,7 @@ def view_suite(suite_id):
         print(tests)
     return render_template('view/suite.html', tests=tests, suiteid=suite_id)
 
-@app.route('/suites/<suite_id>/tests/<test_id>', methods=['GET', 'POST'])
+@app.route('/suites/<suite_id>/tests/<test_id>/', methods=['GET', 'POST'])
 def view_test(suite_id, test_id):
     steps = database_access.get_steps_for_test(test_id)
     runs = database_access.get_runs(test_id)
@@ -35,7 +35,7 @@ def view_test(suite_id, test_id):
         'view/test.html', suiteid=suite_id, testid=test_id,
         steps=steps, runs=runs)
 
-@app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>', methods=['GET', 'POST'])
+@app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/', methods=['GET', 'POST'])
 def view_run(suite_id, test_id, run_id):
     steps = database_access.get_steps_for_run(run_id)
     return render_template('view/run.html', suite_id=suite_id, test_id=test_id, run_id=run_id, steps=steps)
@@ -86,7 +86,15 @@ def run_test(suite_id, test_id):
     Process(target=n.run).start()
     return redirect(url_for('view_test', suite_id=suite_id, test_id=test_id))
 
-@app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/baseline/<name>', methods=['GET', 'POST'])
+@app.route('/suites/<suite_id>/run/', methods=['GET', 'POST'])
+def run_suite(suite_id):
+    tests = database_access.list_tests(suite_id)
+    for test in tests:
+        run_test(suite_id, test[1])
+    return redirect(url_for('view_suite', suite_id=suite_id))
+
+
+@app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/baseline/<name>/', methods=['GET', 'POST'])
 def change_baseline(suite_id, test_id, run_id, name):
     testpath = os.path.join(*(map(str, ['.'+basedir, test_id, run_id])))
     baseline_path = os.path.join('.'+basedir, str(test_id), 'baseline')
