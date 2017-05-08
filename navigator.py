@@ -1,3 +1,7 @@
+'''
+Navigator, the main driver of the $PROJECT_NAME project
+uses selenium to run tests
+'''
 import time
 import traceback
 import os
@@ -10,9 +14,9 @@ from PIL import Image, ImageChops, ImageDraw
 import database_access
 
 BASE = './static'
-BASELINE_DIR='baseline'
-WIDTH=1920
-HEIGHT=1080
+BASELINE_DIR = 'baseline'
+WIDTH = 1920
+HEIGHT = 1080
 
 BROWSERS = {
     'chrome': webdriver.Chrome,
@@ -38,6 +42,9 @@ class Navigator(object):
             browser = BROWSERS[browser.lower()]()
 
         self.last_clicked_on = None
+        self.step_screenshot_passed = None
+        self.step_passed = None
+        self.screenshot_percent = None
         self.browser = browser
         self.browser.set_window_size(WIDTH, HEIGHT)
         self.browser.set_window_position(0, 0)
@@ -116,14 +123,12 @@ class Navigator(object):
             x = 0
             y += client_height
         self.browser.execute_script("window.scrollTo({0}, {1})".format(0, 0))
-        #topnav = self.browser.find_element_by_tag_name("header")
-        #self.browser.execute_script("arguments[0].setAttribute('style', 'position: absolute; top: 0px;')", topnav)
         return full_screenshot
 
     def _take_partial_screenshot(self):
         return Image.open(io.BytesIO(self.browser.get_screenshot_as_png()))
 
-    def _import(self, testid):
+    def _import(self, test_id):
         self.task_list = database_access.get_steps_for_test(test_id) + self.task_list
 
     def _visit(self, url):
@@ -200,10 +205,9 @@ class Navigator(object):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
         database_access.update_run(self.run_id, now, self.test_passed, self.test_screenshot_passed)
 
-if __name__ == "__main__":
-    test_id = 101
-    task_list = (task('visit', 'https://reddit.com', True, 'home'),
-                 task('click', '#header-bottom-left > ul > li:nth-child(2) > a', True, 'new'))
-    n = Navigator(task_list, test_id, browser='chrome')
-    n.run()
-
+# def main():
+#     test_id = 101
+#     task_list = (task('visit', 'https://reddit.com', True, 'home'),
+#                  task('click', '#header-bottom-left > ul > li:nth-child(2) > a', True, 'new'))
+#     n = Navigator(task_list, test_id, browser='chrome')
+#     n.run()
