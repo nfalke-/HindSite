@@ -11,7 +11,8 @@ from utils import makedir, task
 from camera import Video
 from pyvirtualdisplay import Display
 from PIL import Image, ImageChops, ImageDraw
-import database_access
+import RunDao
+import TestDao
 
 BASE = './static'
 BASELINE_DIR = 'baseline'
@@ -27,11 +28,11 @@ BROWSERS = {
 class Navigator(object):
     def __init__(self, test_id, wait_time=5, browser=None):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
-        self.run_id = database_access.add_run(test_id, now)
+        self.run_id = RunDao.add_run(test_id, now)
         self.directory = os.path.join(BASE, str(test_id), str(self.run_id))
         self.baseline = os.path.join(BASE, str(test_id), BASELINE_DIR)
         self.wait_time = wait_time
-        self.task_list = database_access.get_steps_for_test(test_id)
+        self.task_list = TestDao.get_steps_for_test(test_id)
         self.test_passed = True
         self.test_screenshot_passed = True
         self.vdisplay = Display(backend='xvfb', size=(WIDTH, HEIGHT))
@@ -129,7 +130,7 @@ class Navigator(object):
         return Image.open(io.BytesIO(self.browser.get_screenshot_as_png()))
 
     def _import(self, test_id):
-        self.task_list = database_access.get_steps_for_test(test_id) + self.task_list
+        self.task_list = TestDao.get_steps_for_test(test_id) + self.task_list
 
     def _visit(self, url):
         self.browser.get(url)
@@ -184,7 +185,7 @@ class Navigator(object):
                 if True:
                     self.test_screenshot_passed = False
 
-        database_access.add_run_step(
+        RunDao.add_run_step(
             self.run_id,
             task.action,
             task.args,
@@ -203,7 +204,7 @@ class Navigator(object):
         self.browser.close()
         self.vdisplay.stop()
         now = time.strftime('%Y-%m-%d %H:%M:%S')
-        database_access.update_run(self.run_id, now, self.test_passed, self.test_screenshot_passed)
+        RunDao.update_run(self.run_id, now, self.test_passed, self.test_screenshot_passed)
 
 # def main():
 #     test_id = 101
