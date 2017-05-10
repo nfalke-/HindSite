@@ -96,7 +96,6 @@ def copy_test(new_suite_id, old_test_id):
     new_test_id = add_test(new_suite_id, new_name)
     add_steps_to_test(new_test_id, get_steps_for_test(old_test_id))
 
-
 def get_full_test_info(suite_id):
     test_base_info = list_tests(suite_id)
     tests = []
@@ -107,3 +106,14 @@ def get_full_test_info(suite_id):
         else:
             tests.append(test + (0, 0, 'never'))
     return tests
+
+def delete_test(test_id):
+    query = '''
+    delete from
+        tests
+    where
+        testid = %s
+    '''
+    write_to_db(query, (test_id))
+
+delete_test(17)

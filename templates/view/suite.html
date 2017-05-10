@@ -1,6 +1,6 @@
 <head>
     <script>
-        function runSuite(suiteid, testid) {
+        function runSuite(suiteid) {
             var http = new XMLHttpRequest();
             http.open(
                 "GET",
@@ -8,6 +8,17 @@
                 "/run/",
                 true);
             http.send( null )
+        }
+        function deleteTest(suiteid, testid) {
+            var http = new XMLHttpRequest();
+            http.open(
+                "GET",
+                "/suites/" + suiteid +
+                "/tests/" + testid +
+                "/delete/",
+                true);
+            http.send( null )
+            location.reload();
         }
     </script>
 </head>
@@ -27,6 +38,7 @@
                     <td>passed</td>
                     <td>screenshot passed</td>
                     <td>last ran</td>
+                    <td>delete</td>
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +48,11 @@
                         <td>{{passed}}</td>
                         <td>{{screenshot_passed}}</td>
                         <td>{{last_ran}}</td>
+                        <td>
+                        <input type="button", value='x' onclick="deleteTest(
+                            '{{suiteid}}', '{{testid}}'
+                        )">
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

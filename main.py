@@ -96,6 +96,13 @@ def run_suite(suite_id):
 @app.route('/suites/<suite_id>/tests/<test_id>/copy/', methods=['GET', 'POST'])
 def copy_test(suite_id, test_id):
     TestDao.copy_test(suite_id, test_id)
+    return 'OK'
+
+
+@app.route('/suites/<suite_id>/tests/<test_id>/delete/', methods=['GET', 'POST'])
+def delete_test(suite_id, test_id):
+    TestDao.delete_test(test_id)
+    return 'OK'
 
 @app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/baseline/<name>/', methods=['GET', 'POST'])
 def change_baseline(suite_id, test_id, run_id, name):
