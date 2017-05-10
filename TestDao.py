@@ -1,6 +1,21 @@
 from utils import get_from_db, write_to_db, write_many_to_db
 from utils import task
 
+def get_name_from_id(test_id):
+    query = '''
+    select
+        testname
+    from
+        tests
+    where
+        testid = %s
+    '''
+    rows = get_from_db(query, (test_id, ))
+    if rows:
+        if rows[0]:
+            return rows[0][0]
+    return None
+
 def list_tests(suite_id):
     query = '''
     select
@@ -45,8 +60,7 @@ def add_test(suiteid, name):
         tests(testname, suiteid)
     values
         (%s, %s)"""
-    write_to_db(query, (name, suiteid))
-
+    return write_to_db(query, (name, suiteid))
 
 def delete_steps_from_test(testid):
     query = '''delete from
@@ -65,3 +79,31 @@ def add_steps_to_test(testid, steps):
     steps = tuple((testid, stepnumber)+tuple(i for i in step) for stepnumber, step in enumerate(steps, 1))
     write_many_to_db(query, steps)
 
+
+def copy_test(new_suite_id, old_test_id):
+    new_name = get_name_from_id(old_test_id)+'{}'
+    name_list = {i[0] for i in list_tests(new_suite_id)}
+    end = ''
+    if new_name.format(end) in name_list:
+        end = ' (copy)'
+        if new_name.format(end) in name_list:
+            copy_number = 1
+            end = ' (copy {})'.format(copy_number)
+            while new_name.format(end) in name_list:
+                copy_number += 1
+                end = ' (copy {})'.format(copy_number)
+    new_name = new_name.format(end)
+    new_test_id = add_test(new_suite_id, new_name)
+    add_steps_to_test(new_test_id, get_steps_for_test(old_test_id))
+
+
+def get_full_test_info(suite_id):
+    test_base_info = list_tests(suite_id)
+    tests = []
+    for test in test_base_info:
+        run_state = get_most_recent_run_state(test[1])
+        if len(run_state) > 0:
+            tests.append(test + run_state[0])
+        else:
+            tests.append(test + (0, 0, 'never'))
+    return tests

@@ -1,6 +1,6 @@
 <head>
     <script>
-        function runTest(suiteid, testid) {
+        function runSuite(suiteid, testid) {
             var http = new XMLHttpRequest();
             http.open(
                 "GET",
@@ -16,7 +16,7 @@
     <center>
         <a href='/suites/{{suiteid}}/tests/add'>New Test</a><br>
         {% if tests %}
-            <input type="button", value='run suite' onclick="runTest(
+            <input type="button", value='run suite' onclick="runSuite(
                 '{{suiteid}}'
             )"><br>
         {% endif %}
@@ -40,5 +40,22 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <h3>Copy Test</h3>
+        <form method=post enctype=multipart/form-data>
+            <select name="test">
+                <option value=0>Test Name</option>
+                {% for test_name, test_id, passed, screenshot_passed, last_ran in tests %}
+                    <option value="{{test_id}}">{{test_name}}</option>
+                {% endfor %}
+            </select>
+            <select name="suite">
+                <option value=0>Suite Name</option>
+                {% for suite_name, suite_id, browser in suites %}
+                    <option value="{{suite_id}}">{{suite_name}}</option>
+                {% endfor %}
+            </select>
+            <input type=submit value=Copy>
+        </form>
     </center>
 </body>

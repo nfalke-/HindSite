@@ -18,15 +18,13 @@ def index():
 
 @app.route('/suites/<suite_id>/', methods=['GET', 'POST'])
 def view_suite(suite_id):
-    test_base_info = TestDao.list_tests(suite_id)
-    tests = []
-    for test in test_base_info:
-        run_state = TestDao.get_most_recent_run_state(test[1])
-        if len(run_state) > 0:
-            tests.append(test + run_state[0])
-        else:
-            tests.append(test + (0, 0, 'never'))
-    return render_template('view/suite.html', tests=tests, suiteid=suite_id)
+    if request.method == 'POST':
+        test = request.form.get('test')
+        suite = request.form.get('suite')
+        copy_test(suite, test)
+    suites = SuiteDao.list_suites()
+    tests = TestDao.get_full_test_info(suite_id)
+    return render_template('view/suite.html', tests=tests, suites=suites, suiteid=suite_id)
 
 @app.route('/suites/<suite_id>/tests/<test_id>/', methods=['GET', 'POST'])
 def view_test(suite_id, test_id):
@@ -95,6 +93,9 @@ def run_suite(suite_id):
         run_test(suite_id, test[1])
     return redirect(url_for('view_suite', suite_id=suite_id))
 
+@app.route('/suites/<suite_id>/tests/<test_id>/copy/', methods=['GET', 'POST'])
+def copy_test(suite_id, test_id):
+    TestDao.copy_test(suite_id, test_id)
 
 @app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/baseline/<name>/', methods=['GET', 'POST'])
 def change_baseline(suite_id, test_id, run_id, name):
