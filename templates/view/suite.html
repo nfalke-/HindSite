@@ -59,7 +59,7 @@
         </table>
 
         <h3>Copy Test</h3>
-        <form method=post enctype=multipart/form-data>
+        <form method=post enctype=multipart/form-data action=/suites/{{suiteid}}/tests/copy/>
             <select name="test">
                 <option value=0>Test Name</option>
                 {% for test_name, test_id, passed, screenshot_passed, last_ran in tests %}

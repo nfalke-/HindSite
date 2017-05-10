@@ -1,3 +1,17 @@
+<head>
+    <script>
+        function deleteSuite(suiteid) {
+            var http = new XMLHttpRequest();
+            http.open(
+                "GET",
+                "/suites/" + suiteid +
+                "/delete/",
+                true);
+            http.send( null )
+            location.reload();
+        }
+    </script>
+</head>
 <body bgcolor="#D0D0D0">
     <center>
         <a href='/suites/add'>New Suite</a><p>
@@ -10,6 +24,7 @@
                     <td>Description</td>
                     <td>Tests</td>
                     <td>Failing</td>
+                    <td>Delete</td>
                 </tr>
             </thead>
             <tbody>
@@ -21,9 +36,25 @@
                         <td>{{ description }}</td>
                         <td>{{ tests }}</td>
                         <td>{{ failing }}</td>
+                        <td>
+                        <input type="button", value='x' onclick="deleteSuite(
+                            '{{suiteid}}'
+                        )">
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <h3>Copy Suite</h3>
+        <form method=post enctype=multipart/form-data action=/suites/copy/>
+            <select name="suite">
+                <option value=0>Suite Name</option>
+                {% for suite_name, suite_id, browser in suites %}
+                    <option value="{{suite_id}}">{{suite_name}}</option>
+                {% endfor %}
+            </select>
+            <input type=submit value=Copy>
+        </form>
     </center>
 </body>
