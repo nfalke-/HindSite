@@ -2,6 +2,7 @@
 Navigator, the main driver of the $PROJECT_NAME project
 uses selenium to run tests
 '''
+from selenium.common.exceptions import WebDriverException
 import time
 import traceback
 import os
@@ -57,6 +58,9 @@ class Navigator(object):
             'click': self._click,
             'import': self._import,
             'insert': self._insert,
+            'sleep': self._sleep,
+            'refresh': self._refresh,
+            'execute': self._execute,
         }
         makedir(self.directory)
         makedir(self.baseline)
@@ -135,9 +139,25 @@ class Navigator(object):
     def _import(self, test_id):
         self.task_list = TestDao.get_steps_for_test(test_id) + self.task_list
 
+    def _refresh(self, _):
+        self.video.resume()
+        time.sleep(.5)
+        self.browser.refresh()
+        time.sleep(.5)
+        self.video.pause()
+
     def _visit(self, url):
         self.browser.get(url)
         self.video.resume()
+        time.sleep(2)
+        self.video.pause()
+
+    def _execute(self, script):
+        self.video.resume()
+        try:
+            self.browser.execute_script(script)
+        except WebDriverException:
+            pass
         time.sleep(2)
         self.video.pause()
 
@@ -156,6 +176,9 @@ class Navigator(object):
     def _insert(self, text):
         if self.last_clicked_on:
             self.last_clicked_on.send_keys(text)
+
+    def _sleep(self, time_in_seconds):
+        time.sleep(float(time_in_seconds))
 
     def _save_and_diff(self, screenshot_name):
         screenshot = self._take_fullpage_screenshot()
