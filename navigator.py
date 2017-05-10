@@ -18,6 +18,9 @@ BASE = './static'
 BASELINE_DIR = 'baseline'
 WIDTH = 1920
 HEIGHT = 1080
+PATH_TO_DRIVERS = 'drivers'
+
+os.environ['PATH'] += ':'+os.path.join(os.getcwd(), PATH_TO_DRIVERS)
 
 BROWSERS = {
     'chrome': webdriver.Chrome,
