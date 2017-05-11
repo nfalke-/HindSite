@@ -28,7 +28,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for suitename, suiteid, browser in suites %}
+                {% for suitename, suiteid, browser, description in suites %}
                     <tr>
                         <td><a href='/suites/{{suiteid}}'>{{ suitename }}</a></td>
                         <td>{{ browser }}</td>
@@ -50,7 +50,7 @@
         <form method=post enctype=multipart/form-data action=/suites/copy/>
             <select name="suite">
                 <option value=0>Suite Name</option>
-                {% for suite_name, suite_id, browser in suites %}
+                {% for suite_name, suite_id, browser, description in suites %}
                     <option value="{{suite_id}}">{{suite_name}}</option>
                 {% endfor %}
             </select>

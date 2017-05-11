@@ -17,10 +17,10 @@ def get_name_from_id(suite_id):
             return rows[0][0]
     return None
 
-def get_browser_from_id(suite_id):
+def get_description_from_id(suite_id):
     query = '''
     select
-        browser
+        description
     from
         suites
     where
@@ -35,18 +35,18 @@ def get_browser_from_id(suite_id):
 def list_suites():
     query = '''
     select
-        suitename, suiteid, browser
+        suitename, suiteid, browser, description
     from
         suites
     '''
     return get_from_db(query)
 
-def add_suite(name, browser):
+def add_suite(name, browser, description):
     query = """insert into
-        suites (suitename, browser)
+        suites (suitename, browser, description)
     values
-        (%s, %s)"""
-    return write_to_db(query, (name, browser))
+        (%s, %s, %s)"""
+    return write_to_db(query, (name, browser, description))
 
 def delete_suite(suite_id):
     query = """delete from
@@ -65,7 +65,11 @@ def get_browser_for_suite(suiteid):
     where
         suiteid = %s
     '''
-    return get_from_db(query, (suiteid))
+    rows = get_from_db(query, (suiteid))
+    if rows:
+        if rows[0]:
+            return rows[0][0]
+    return None
 
 def copy_suite(old_suite_id):
     new_name = get_name_from_id(old_suite_id)+'{}'
@@ -80,9 +84,10 @@ def copy_suite(old_suite_id):
                 copy_number += 1
                 end = ' (copy {})'.format(copy_number)
     new_name = new_name.format(end)
-    browser = get_browser_from_id(old_suite_id)
+    browser = get_browser_for_suite(old_suite_id)
+    description = get_description_from_id(old_suite_id)
     tests = [i[1] for i in TestDao.list_tests(old_suite_id)]
-    new_suite_id = add_suite(new_name, browser)
+    new_suite_id = add_suite(new_name, browser, description)
     for test_id in tests:
         TestDao.copy_test(new_suite_id, test_id)
 

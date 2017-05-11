@@ -40,7 +40,8 @@ def add_suite():
         if request.form.get('suitename'):
             name = request.form.get('suitename')
             browser = request.form.get('browser')
-            SuiteDao.add_suite(name, browser)
+            description = request.form.get('description')
+            SuiteDao.add_suite(name, browser, description)
             return redirect(url_for('index'))
     return render_template('add/suite.html')
 
@@ -77,7 +78,7 @@ def edit_test(suite_id, test_id):
 #run
 @app.route('/suites/<suite_id>/tests/<test_id>/run/', methods=['GET', 'POST'])
 def run_test(suite_id, test_id):
-    browser = SuiteDao.get_browser_for_suite(suite_id)[0][0]
+    browser = SuiteDao.get_browser_for_suite(suite_id)
     n = Navigator(test_id, browser=browser)
     Process(target=n.run).start()
     return redirect(url_for('view_test', suite_id=suite_id, test_id=test_id))

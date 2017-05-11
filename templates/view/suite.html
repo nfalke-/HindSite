@@ -68,7 +68,7 @@
             </select>
             <select name="suite">
                 <option value=0>Suite Name</option>
-                {% for suite_name, suite_id, browser in suites %}
+                {% for suite_name, suite_id, browser, description in suites %}
                     <option value="{{suite_id}}">{{suite_name}}</option>
                 {% endfor %}
             </select>
