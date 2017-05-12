@@ -1,15 +1,26 @@
 <head>
+    <script src="/static/common.js"></script>
     <script>
-        function runTest(suiteid, testid) {
-            var http = new XMLHttpRequest();
-            http.open(
-                "GET",
-                "/suites/" + suiteid +
-                "/tests/" + testid +
-                "/run/",
-                true);
-            http.send( null )
-        }
+        var http = new XMLHttpRequest();
+        http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var table_json = JSON.parse(this.responseText);
+                retVal = []
+                for (var i = 0; i < table_json.runs.length; i++) {
+                    row = table_json.runs[i]
+                    var run_link = build_link("/suites/{{suite_id}}/tests/{{test_id}}/runs/" + row[0], row[0]);
+                    var start_time = build_span(row[1]);
+                    var end_time = build_span(row[2]);
+                    var passed = build_span(row[3]);
+                    var screenshot_passed = build_span(row[4]);
+                    modified = [run_link, start_time, end_time, passed, screenshot_passed]
+                    retVal.push(modified)
+                }
+                updateTable('runs', retVal);
+            }
+        };
+        var url = "/suites/{{suite_id}}/tests/{{test_id}}/data/";
+        update(url);
     </script>
 </head>
 
@@ -17,12 +28,11 @@
     <center>
         <table border="1">
             {% if steps %}
-                <input type="button", value='run test' onclick="runTest(
-                    '{{suiteid}}', '{{testid}}'
+                <input type="button", value='run suite' onclick="sendRequest(
+                    '/suites/{{suite_id}}/tests/{{test_id}}/run/'
                 )"><br>
             {% endif %}
-            <a href="/suites/{{suiteid}}/tests/{{testid}}/edit/">edit test</a>
-
+            <a href="/suites/{{suite_id}}/tests/{{test_id}}/edit/">edit test</a>
 
             <thead>
                 <tr>
@@ -55,17 +65,7 @@
                     <td>screenshot_passed</td>
                 </tr>
             </thead>
-            <tbody>
-                {% for runid, start_time, end_time, passed, screenshot_passed in runs %}
-                    <tr>
-                        <td><a href=/suites/{{suiteid}}/tests/{{testid}}/runs/{{ runid }} >{{ runid }}</a></td>
-                        <td>{{ start_time }}</td>
-                        <td>{{ end_time }}</td>
-                        <td>{{ passed }}</td>
-                        <td>{{ screenshot_passed }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            <tbody id=runs> </tbody>
         </table>
     </center>
 </body>

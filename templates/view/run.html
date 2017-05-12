@@ -1,17 +1,46 @@
 <head>
     <link rel="stylesheet" type="text/css" href="/static/run.css">
+    <script src="/static/common.js"></script>
     <script>
-        function submitForm(suiteid, testid, runid, screenshot_name) {
-            var http = new XMLHttpRequest();
-            http.open(
-                "GET",
-                "/suites/" + suiteid +
-                "/tests/" + testid +
-                "/runs/" + runid +
-                "/baseline/" + screenshot_name,
-                true);
-            http.send( null )
-        }
+
+        var http = new XMLHttpRequest();
+        http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var table_json = JSON.parse(this.responseText);
+                retVal = []
+                for (var i = 0; i < table_json.length; i++) {
+                    row = table_json[i]
+                    var action = build_span(row[0]);
+                    var args = build_span(row[1]);
+                    var screenshot = build_span('');
+                    var diff_screenshot = build_span('');
+                    if (row[6]) {
+                        screenshot = document.createElement("div");
+                        var screenshot_image = build_image({{test_id}}, {{run_id}}, row[6]);
+                        var accept_button = build_button("Accept as Baseline",
+                        "\"sendRequest('/suites/{{suite_id}}" + "/tests/{{test_id}}" + 
+                        "/runs/{{run_id}}" + "/baseline/'" + row[6] + ")\""
+                        );
+                        screenshot.append(screenshot_image);
+                        screenshot.append(accept_button);
+                        
+                        diff_screenshot = build_span('No baseline Available');
+                        if (row[4] >= 0) {
+                            diff_screenshot = document.createElement("div");
+                            diff_screenshot_image = build_image({{test_id}}, {{run_id}}, "diff_"+row[6])
+                            diff_screenshot.append(diff_screenshot_image);
+                            diff_screenshot.append(build_span("Difference: "+ row[4]*100 + '%'));
+                        }
+                    var screenshot_passed = build_span(row[5])
+                    }
+                    modified = [action, args, screenshot, diff_screenshot, screenshot_passed]
+                    retVal.push(modified)
+                }
+                updateTable('steps', retVal);
+            }
+        };
+        var url = "/suites/{{suite_id}}/tests/{{test_id}}/runs/{{run_id}}/data/";
+        update(url);
     </script>
 </head>
 
@@ -30,46 +59,7 @@
                     <td>Screenshot Passed</td>
                 </tr>
             </thead>
-            <tbody>
-                {% for action, args, passed, take_screenshot,
-                       screenshot_percentage, screenshot_passed, screenshot_name in steps %}
-                    <tr>
-                        <td>{{ action }}</td>
-                        <td>{{ args }}</td>
-                        <td>
-                            {% if take_screenshot %}
-                                <div class=screenshot-container>
-                                   <img class=screenshot src="/static/{{test_id}}/{{run_id}}/{{screenshot_name}}.png">
-                                </div>
-                                
-                                {% if screenshot_percentage >= 0 %}
-                                    {{screenshot_percentage}}
-                                {% else %}
-                                    no baseline available
-                                {% endif %}
-                                <input type="button", value='accept as baseline' onclick="submitForm(
-                                    '{{suite_id}}',
-                                    '{{test_id}}',
-                                    '{{run_id}}',
-                                    '{{screenshot_name}}'
-                                )">
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if take_screenshot %}
-                                {% if screenshot_percentage >= 0 %}
-                                <div class=screenshot-container>
-                                   <img class=screenshot src="/static/{{test_id}}/{{run_id}}/diff_{{screenshot_name}}.png">
-                                </div>
-                                {% else %}
-                                    no baseline available
-                                {% endif %}
-                            {% endif %}
-                        </td>
-                        <td>{{ screenshot_passed }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            <tbody id="steps"></tbody>
         </table>
     </center>
     <div id="modal" class="modal">

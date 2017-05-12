@@ -1,34 +1,44 @@
 <head>
+    <script src="/static/common.js"></script>
     <script>
-        function runSuite(suiteid) {
-            var http = new XMLHttpRequest();
-            http.open(
-                "GET",
-                "/suites/" + suiteid +
-                "/run/",
-                true);
-            http.send( null )
-        }
-        function deleteTest(suiteid, testid) {
-            var http = new XMLHttpRequest();
-            http.open(
-                "GET",
-                "/suites/" + suiteid +
-                "/tests/" + testid +
-                "/delete/",
-                true);
-            http.send( null )
-            location.reload();
-        }
+        var http = new XMLHttpRequest();
+        http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var table_json = JSON.parse(this.responseText);
+                retVal = []
+                for (var i = 0; i < table_json.length; i++) {
+                    row = table_json[i]
+                    var test_name = build_link("/suites/{{suite_id}}/tests/" + row[1], row[0]);
+                    var test_passed = build_span(row[2]);
+                    if (row[2] == '') {
+                        test_passed = build_span("pending...");
+                    }
+                    var screenshot_passed = build_span(row[3]);
+                    if (row[3] = '') {
+                        test_passed = build_span("pending...");
+                    }
+                    var last_ran = build_span(row[4]);
+                    var delete_button = build_button("x", 
+                        "\"sendRequest('/suites/{{suite_id}}/tests/" + row[1] + "/delete/')\""
+                        )
+                    modified = [test_name, test_passed, screenshot_passed, last_ran, delete_button]
+                    retVal.push(modified)
+                }
+                updateTable('tests', retVal);
+            }
+        };
+
+        var url = "/suites/{{suite_id}}/data/";
+        update(url);
     </script>
 </head>
 
 <body bgcolor="#D0D0D0">
     <center>
-        <a href='/suites/{{suiteid}}/tests/add'>New Test</a><br>
+        <a href='/suites/{{suite_id}}/tests/add'>New Test</a><br>
         {% if tests %}
-            <input type="button", value='run suite' onclick="runSuite(
-                '{{suiteid}}'
+            <input type="button", value='run suite' onclick="sendRequest(
+                '/suites/{{suite_id}}/run/'
             )"><br>
         {% endif %}
         <table border="1">
@@ -41,25 +51,11 @@
                     <td>delete</td>
                 </tr>
             </thead>
-            <tbody>
-                {% for testname, testid, passed, screenshot_passed, last_ran in tests %}
-                    <tr>
-                        <td><a href='/suites/{{suiteid}}/tests/{{testid}}'>{{ testname }}</a></td>
-                        <td>{{passed}}</td>
-                        <td>{{screenshot_passed}}</td>
-                        <td>{{last_ran}}</td>
-                        <td>
-                        <input type="button", value='x' onclick="deleteTest(
-                            '{{suiteid}}', '{{testid}}'
-                        )">
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            <tbody id='tests'></tbody>
         </table>
 
         <h3>Copy Test</h3>
-        <form method=post enctype=multipart/form-data action=/suites/{{suiteid}}/tests/copy/>
+        <form method=post enctype=multipart/form-data action=/suites/{{suite_id}}/tests/copy/>
             <select name="test">
                 <option value=0>Test Name</option>
                 {% for test_name, test_id, passed, screenshot_passed, last_ran in tests %}

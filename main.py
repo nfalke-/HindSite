@@ -5,10 +5,16 @@ import os
 import SuiteDao
 import TestDao
 import RunDao
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 app = Flask("app")
 basedir = '/static'
+
+from decimal import Decimal
+def json_safe(value):
+    if isinstance(value, Decimal):
+        return float(value)
+    return value
 
 #view
 @app.route('/', methods=['GET', 'POST'])
@@ -20,18 +26,47 @@ def index():
 def view_suite(suite_id):
     suites = SuiteDao.list_suites()
     tests = TestDao.get_full_test_info(suite_id)
-    return render_template('view/suite.html', tests=tests, suites=suites, suiteid=suite_id)
+    return render_template('view/suite.html', tests=tests, suites=suites, suite_id=suite_id)
 
 @app.route('/suites/<suite_id>/tests/<test_id>/', methods=['GET', 'POST'])
 def view_test(suite_id, test_id):
     steps = TestDao.get_steps_for_test(test_id)
     runs = RunDao.get_runs(test_id)
-    return render_template('view/test.html', suiteid=suite_id, testid=test_id, steps=steps, runs=runs)
+    return render_template('view/test.html', suite_id=suite_id, test_id=test_id, steps=steps, runs=runs)
 
 @app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/', methods=['GET', 'POST'])
 def view_run(suite_id, test_id, run_id):
     steps = RunDao.get_steps_for_run(run_id)
     return render_template('view/run.html', suite_id=suite_id, test_id=test_id, run_id=run_id, steps=steps)
+
+
+#api
+@app.route('/data/', methods=['GET', 'POST'])
+def index_api():
+    return jsonify(SuiteDao.list_suites())
+
+@app.route('/suites/<suite_id>/data/', methods=['GET', 'POST'])
+def suite_api(suite_id):
+    tests = TestDao.get_full_test_info(suite_id)
+    tests = [[json_safe(i) for i in j] for j in tests]
+    return jsonify(tests)
+
+@app.route('/suites/<suite_id>/tests/<test_id>/data/', methods=['GET', 'POST'])
+def test_api(suite_id, test_id):
+    steps = TestDao.get_steps_for_test(test_id)
+    runs = RunDao.get_runs(test_id)
+    data = {
+        "steps": [[json_safe(i) for i in j] for j in steps],
+        "runs": [[json_safe(i) for i in j] for j in runs]
+    }
+    return jsonify(data)
+
+@app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/data/', methods=['GET', 'POST'])
+def run_api(suite_id, test_id, run_id):
+    steps = RunDao.get_steps_for_run(run_id)
+    steps = [[json_safe(i) for i in j] for j in steps]
+    return jsonify(steps)
+
 
 #add
 @app.route('/suites/add/', methods=['GET', 'POST'])

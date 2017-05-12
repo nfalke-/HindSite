@@ -1,16 +1,31 @@
 <head>
+    <script src="/static/common.js"></script>
     <script>
-        function deleteSuite(suiteid) {
-            var http = new XMLHttpRequest();
-            http.open(
-                "GET",
-                "/suites/" + suiteid +
-                "/delete/",
-                true);
-            http.send( null )
-            location.reload();
-        }
+        var http = new XMLHttpRequest();
+        http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var table_json = JSON.parse(this.responseText);
+                retVal = []
+                for (var i = 0; i < table_json.length; i++) {
+                    row = table_json[i]
+                    var suite_name = build_link("/suites/" + row[1], row[0]);
+                    var browser = build_span(row[2]);
+                    var description = build_span(row[3]);
+                    var blank = build_span('')
+                    var delete_button = build_button("x", 
+                        "\"sendRequest('/suites/" + row[1] + "/delete/')\""
+                        )
+                    modified = [suite_name, browser, blank, description, blank, blank, delete_button]
+                    retVal.push(modified)
+                }
+                updateTable('suites', retVal);
+            }
+        };
+
+        var url = "/data/";
+        update(url);
     </script>
+
 </head>
 <body bgcolor="#D0D0D0">
     <center>
@@ -27,23 +42,7 @@
                     <td>Delete</td>
                 </tr>
             </thead>
-            <tbody>
-                {% for suitename, suiteid, browser, description in suites %}
-                    <tr>
-                        <td><a href='/suites/{{suiteid}}'>{{ suitename }}</a></td>
-                        <td>{{ browser }}</td>
-                        <td>{{ lastran }}</td>
-                        <td>{{ description }}</td>
-                        <td>{{ tests }}</td>
-                        <td>{{ failing }}</td>
-                        <td>
-                        <input type="button", value='x' onclick="deleteSuite(
-                            '{{suiteid}}'
-                        )">
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            <tbody id="suites"> </tbody>
         </table>
 
         <h3>Copy Suite</h3>
