@@ -9,13 +9,14 @@
                 for (var i = 0; i < table_json.length; i++) {
                     row = table_json[i]
                     var suite_name = build_link("/suites/" + row[1], row[0]);
-                    var browser = build_span(row[2]);
-                    var description = build_span(row[3]);
-                    var blank = build_span('')
+                    var browser = build_span(row[3]);
+                    var description = build_span(row[2]);
+                    var blank = build_span('');
                     var delete_button = build_button("x", 
-                        "\"sendRequest('/suites/" + row[1] + "/delete/')\""
-                        )
-                    modified = [suite_name, browser, blank, description, blank, blank, delete_button]
+                        "sendRequest('/suites/" + row[1] + "/delete/')"
+                    );
+                    var dims = build_span(row[4]+'x'+row[5]);
+                    modified = [suite_name, browser, dims, blank, description, blank, blank, delete_button]
                     retVal.push(modified)
                 }
                 updateTable('suites', retVal);
@@ -25,8 +26,8 @@
         var url = "/data/";
         update(url);
     </script>
-
 </head>
+
 <body bgcolor="#D0D0D0">
     <center>
         <a href='/suites/add'>New Suite</a><p>
@@ -35,6 +36,7 @@
                 <tr>
                     <td>Suite</td>
                     <td>Browser</td>
+                    <td>Screen Size</td>
                     <td>Last ran</td>
                     <td>Description</td>
                     <td>Tests</td>
@@ -49,7 +51,7 @@
         <form method=post enctype=multipart/form-data action=/suites/copy/>
             <select name="suite">
                 <option value=0>Suite Name</option>
-                {% for suite_name, suite_id, browser, description in suites %}
+                {% for suite_name, suite_id, description, browser, width, height in suites %}
                     <option value="{{suite_id}}">{{suite_name}}</option>
                 {% endfor %}
             </select>

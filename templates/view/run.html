@@ -31,8 +31,8 @@
                             diff_screenshot.append(diff_screenshot_image);
                             diff_screenshot.append(build_span("Difference: "+ row[4]*100 + '%'));
                         }
-                    var screenshot_passed = build_span(row[5])
                     }
+                    var screenshot_passed = build_span(row[5])
                     modified = [action, args, screenshot, diff_screenshot, screenshot_passed]
                     retVal.push(modified)
                 }

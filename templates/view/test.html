@@ -28,7 +28,7 @@
     <center>
         <table border="1">
             {% if steps %}
-                <input type="button", value='run suite' onclick="sendRequest(
+                <input type="button" value='run test' onclick="sendRequest(
                     '/suites/{{suite_id}}/tests/{{test_id}}/run/'
                 )"><br>
             {% endif %}

@@ -115,5 +115,3 @@ def delete_test(test_id):
         testid = %s
     '''
     write_to_db(query, (test_id))
-
-delete_test(17)

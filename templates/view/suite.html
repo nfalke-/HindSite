@@ -19,7 +19,7 @@
                     }
                     var last_ran = build_span(row[4]);
                     var delete_button = build_button("x", 
-                        "\"sendRequest('/suites/{{suite_id}}/tests/" + row[1] + "/delete/')\""
+                        "sendRequest('/suites/{{suite_id}}/tests/" + row[1] + "/delete/')"
                         )
                     modified = [test_name, test_passed, screenshot_passed, last_ran, delete_button]
                     retVal.push(modified)
@@ -64,7 +64,7 @@
             </select>
             <select name="suite">
                 <option value=0>Suite Name</option>
-                {% for suite_name, suite_id, browser, description in suites %}
+                {% for suite_name, suite_id, description, browser, width, height in suites %}
                     <option value="{{suite_id}}">{{suite_name}}</option>
                 {% endfor %}
             </select>

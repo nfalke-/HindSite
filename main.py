@@ -76,7 +76,9 @@ def add_suite():
             name = request.form.get('suitename')
             browser = request.form.get('browser')
             description = request.form.get('description')
-            SuiteDao.add_suite(name, browser, description)
+            width = request.form.get('width')
+            height = request.form.get('height')
+            SuiteDao.add_suite(name, description, browser, width, height)
             return redirect(url_for('index'))
     return render_template('add/suite.html')
 
@@ -110,11 +112,35 @@ def edit_test(suite_id, test_id):
         steps = [(1, '', '', False, '', .10000)]
     return render_template('edit_steps.html', steps=steps)
 
+@app.route('/suites/<suite_id>/edit/', methods=['GET', 'POST'])
+def edit_suite(suite_id):
+    if request.method == 'POST':
+        suite_name = request.form.get('suitename')
+        description = request.form.get('description')
+        browser = request.form.get('browser')
+        width = request.form.get('width')
+        height = request.form.get('height')
+        SuiteDao.update_suite_settings(suite_id, browser, width, height)
+        SuiteDao.update_suite(suite_id, suite_name, description)
+
+        return redirect(url_for('view_suite', suite_id=suite_id))
+    browser, width, height = SuiteDao.get_settings_for_suite(suite_id)
+    suite_name, description = SuiteDao.get_suite(suite_id)
+
+    return render_template(
+        'edit_suite.html',
+        suite_name=suite_name,
+        description=description,
+        browser=browser,
+        width=width,
+        height=height
+        )
+
 #run
 @app.route('/suites/<suite_id>/tests/<test_id>/run/', methods=['GET', 'POST'])
 def run_test(suite_id, test_id):
-    browser = SuiteDao.get_browser_for_suite(suite_id)
-    n = Navigator(test_id, browser=browser)
+    browser, width, height = SuiteDao.get_settings_for_suite(suite_id)
+    n = Navigator(test_id, width, height, browser=browser)
     Process(target=n.run).start()
     return redirect(url_for('view_test', suite_id=suite_id, test_id=test_id))
 

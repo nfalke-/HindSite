@@ -1,4 +1,5 @@
 function sendRequest(url) {
+    console.log("sending request for (url)");
     var http = new XMLHttpRequest();
     http.open("GET", url, true);
     http.send( null )

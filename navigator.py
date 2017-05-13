@@ -17,8 +17,6 @@ import TestDao
 
 BASE = './static'
 BASELINE_DIR = 'baseline'
-WIDTH = 1920
-HEIGHT = 1080
 PATH_TO_DRIVERS = 'drivers'
 
 os.environ['PATH'] += ':'+os.path.join(os.getcwd(), PATH_TO_DRIVERS)
@@ -26,11 +24,12 @@ os.environ['PATH'] += ':'+os.path.join(os.getcwd(), PATH_TO_DRIVERS)
 BROWSERS = {
     'chrome': webdriver.Chrome,
     'firefox': webdriver.Firefox,
-    'edge': webdriver.edge
+    'edge': webdriver.edge,
+    'opera': webdriver.Opera
 }
 
 class Navigator(object):
-    def __init__(self, test_id, wait_time=5, browser=None):
+    def __init__(self, test_id, width, height, wait_time=5, browser=None):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
         self.run_id = RunDao.add_run(test_id, now)
         self.directory = os.path.join(BASE, str(test_id), str(self.run_id))
@@ -39,7 +38,7 @@ class Navigator(object):
         self.task_list = TestDao.get_steps_for_test(test_id)
         self.test_passed = True
         self.test_screenshot_passed = True
-        self.vdisplay = Display(backend='xvfb', size=(WIDTH, HEIGHT))
+        self.vdisplay = Display(backend='xvfb', size=(width, height))
         self.vdisplay.start()
         if not browser or browser.lower() not in BROWSERS.keys():
             browser = webdriver.Firefox()
@@ -51,7 +50,7 @@ class Navigator(object):
         self.step_passed = None
         self.screenshot_percent = None
         self.browser = browser
-        self.browser.set_window_size(WIDTH, HEIGHT)
+        self.browser.set_window_size(width, height)
         self.browser.set_window_position(0, 0)
         self.commands = {
             'visit': self._visit,
@@ -64,7 +63,7 @@ class Navigator(object):
         }
         makedir(self.directory)
         makedir(self.baseline)
-        self.video = Video(os.path.join(self.directory, "video"), 0, 0, WIDTH, HEIGHT)
+        self.video = Video(os.path.join(self.directory, "video"), 0, 0, width, height)
 
     def _highlight(self, element):
         driver = element._parent
@@ -234,7 +233,7 @@ class Navigator(object):
 
 # def main():
 #     test_id = 101
-#     task_list = (task('visit', 'https://reddit.com', True, 'home'),
-#                  task('click', '#header-bottom-left > ul > li:nth-child(2) > a', True, 'new'))
-#     n = Navigator(task_list, test_id, browser='chrome')
+#     task_list = (task('visit', 'https://reddit.com', True, 'home', 1),
+#                  task('click', '#header-bottom-left > ul > li:nth-child(2) > a', True, 'new', 1))
+#     n = Navigator(task_list, test_id, browser='')
 #     n.run()

@@ -1,0 +1,41 @@
+<head>
+</head>
+<body bgcolor="#D0D0D0">
+    <center>
+        <div id="StepTableDiv">
+            <form method=post enctype=multipart/form-data onsubmit="activateAll()">
+                <table id="StepTable" border="1">
+                    <thead>
+                        <tr>
+                            <td>Suite Name</td>
+                            <td>Description</td>
+                            <td>Browser</td>
+                            <td>width</td>
+                            <td>height</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <td><input name="suitename" value="{{suite_name}}"></td>
+                        <td>
+                            <textarea name="description" cols="30">{{description}}</textarea>
+                        </td>
+                        <td>
+                            <select name="browser">
+                                <option value="chrome">Chrome</option>
+                                <option value="firefox"
+                                {% if browser == 'firefox' %} selected {% endif %}>Firefox</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input name="width" value="{{width}}"></textarea>
+                        </td>
+                        <td>
+                            <input name="height" value="{{height}}"></textarea>
+                        </td>
+                    </tbody>
+                </table>
+                <input type=submit value=Submit >
+            </form>
+        </div>
+    </center>
+</body>
