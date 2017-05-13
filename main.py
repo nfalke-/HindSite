@@ -6,7 +6,7 @@ from Daos import SuiteDao, TestDao, RunDao
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 app = Flask("app")
-basedir = '/static'
+basedir = '/static/files'
 
 from decimal import Decimal
 def json_safe(value):
@@ -186,5 +186,5 @@ def change_baseline(suite_id, test_id, run_id, name):
         copyfile(newfile, baseline_file)
     return "OK"
 
-app.run(host="0.0.0.0", port=8060, debug=True)
+app.run(host="0.0.0.0", port=8080, debug=True)
 

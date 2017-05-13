@@ -52,7 +52,7 @@ function build_image(test_id, run_id, screenshot_name) {
     }
     screenshot.setAttribute("class", "screenshot")
     screenshot.setAttribute("src",
-            "/static/" + test_id +
+            "/static/files/" + test_id +
             "/" + run_id +
             "/" + screenshot_name +
             ".png");

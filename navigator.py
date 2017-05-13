@@ -14,7 +14,7 @@ from pyvirtualdisplay import Display
 from PIL import Image, ImageChops, ImageDraw
 from Daos import TestDao, RunDao
 
-BASE = './static'
+BASE = './static/files'
 BASELINE_DIR = 'baseline'
 PATH_TO_DRIVERS = 'drivers'
 

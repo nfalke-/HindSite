@@ -36,6 +36,7 @@
 <body bgcolor="#D0D0D0">
     <center>
         <a href='/suites/{{suite_id}}/tests/add'>New Test</a><br>
+        <a href='/suites/{{suite_id}}/edit'>Edit Suite</a><br>
         {% if tests %}
             <input type="button", value='run suite' onclick="sendRequest(
                 '/suites/{{suite_id}}/run/'

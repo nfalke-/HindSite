@@ -18,8 +18,8 @@
                         screenshot = document.createElement("div");
                         var screenshot_image = build_image({{test_id}}, {{run_id}}, row[6]);
                         var accept_button = build_button("Accept as Baseline",
-                        "\"sendRequest('/suites/{{suite_id}}" + "/tests/{{test_id}}" + 
-                        "/runs/{{run_id}}" + "/baseline/'" + row[6] + ")\""
+                        "sendRequest('/suites/{{suite_id}}" + "/tests/{{test_id}}" + 
+                        "/runs/{{run_id}}" + "/baseline/" + row[6] + ".png')"
                         );
                         screenshot.append(screenshot_image);
                         screenshot.append(accept_button);
@@ -47,7 +47,7 @@
 <body bgcolor="#D0D0D0">
     <center>
         <div class=thumbnail-container>
-           <img id=vid src="/static/{{test_id}}/{{run_id}}/video.png">
+           <img id=vid src="/static/files/{{test_id}}/{{run_id}}/video.png">
         </div>
         <table border="1">
             <thead>
@@ -68,7 +68,7 @@
     <div id="video-modal" class="video-modal">
         <span class="close">&times;</span>
         <video class="modal-content" controls="controls">
-            <source src="/static/{{test_id}}/{{run_id}}/video.mp4" type="video/mp4">
+            <source src="/static/files/{{test_id}}/{{run_id}}/video.mp4" type="video/mp4">
         </video>
     </div>
     <script src="/static/run.js"></script>
