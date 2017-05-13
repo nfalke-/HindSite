@@ -1,5 +1,5 @@
 from utils import get_from_db, write_to_db, write_many_to_db
-import TestDao
+from Daos import TestDao
 
 
 def get_suite(suite_id):

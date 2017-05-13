@@ -12,8 +12,7 @@ from utils import makedir, task
 from camera import Video
 from pyvirtualdisplay import Display
 from PIL import Image, ImageChops, ImageDraw
-import RunDao
-import TestDao
+from Daos import TestDao, RunDao
 
 BASE = './static'
 BASELINE_DIR = 'baseline'

@@ -2,9 +2,7 @@ from navigator import Navigator
 from shutil import copyfile
 from multiprocessing import Process
 import os
-import SuiteDao
-import TestDao
-import RunDao
+from Daos import SuiteDao, TestDao, RunDao
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 app = Flask("app")
@@ -110,7 +108,7 @@ def edit_test(suite_id, test_id):
     steps = [(i, ) + step for i, step in enumerate(steps, 1)]
     if not steps:
         steps = [(1, '', '', False, '', .10000)]
-    return render_template('edit_steps.html', steps=steps)
+    return render_template('edit/test.html', steps=steps)
 
 @app.route('/suites/<suite_id>/edit/', methods=['GET', 'POST'])
 def edit_suite(suite_id):
@@ -128,7 +126,7 @@ def edit_suite(suite_id):
     suite_name, description = SuiteDao.get_suite(suite_id)
 
     return render_template(
-        'edit_suite.html',
+        'edit/suite.html',
         suite_name=suite_name,
         description=description,
         browser=browser,
