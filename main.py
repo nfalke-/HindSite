@@ -41,7 +41,10 @@ def view_run(suite_id, test_id, run_id):
 #api
 @app.route('/data/', methods=['GET', 'POST'])
 def index_api():
-    return jsonify(SuiteDao.list_suites())
+    suites = []
+    for suite in SuiteDao.list_suites():
+        suites += [suite + SuiteDao.get_most_recent_run_state(suite[1])]
+    return jsonify(suites)
 
 @app.route('/suites/<suite_id>/data/', methods=['GET', 'POST'])
 def suite_api(suite_id):
@@ -95,6 +98,7 @@ def edit_test(suite_id, test_id):
         actions = request.form.getlist('action')
         checked = set(map(int, request.form.getlist('screenshot')))
         screenshots = [i in checked for i in range(1, len(actions)+1)]
+        name = request.form.get('name')
         steps = zip(
             request.form.getlist('action'),
             request.form.getlist('arguments'),
@@ -103,12 +107,14 @@ def edit_test(suite_id, test_id):
             request.form.getlist('threshold')
         )
         TestDao.add_steps_to_test(test_id, steps)
+        TestDao.update_name(test_id, name)
         return redirect(url_for('view_test', suite_id=suite_id, test_id=test_id))
+    name = TestDao.get_name_from_id(test_id)
     steps = TestDao.get_steps_for_test(test_id)
     steps = [(i, ) + step for i, step in enumerate(steps, 1)]
     if not steps:
         steps = [(1, '', '', False, '', .10000)]
-    return render_template('edit/test.html', steps=steps)
+    return render_template('edit/test.html', steps=steps, name=name)
 
 @app.route('/suites/<suite_id>/edit/', methods=['GET', 'POST'])
 def edit_suite(suite_id):
@@ -120,8 +126,8 @@ def edit_suite(suite_id):
         height = request.form.get('height')
         SuiteDao.update_suite_settings(suite_id, browser, width, height)
         SuiteDao.update_suite(suite_id, suite_name, description)
-
         return redirect(url_for('view_suite', suite_id=suite_id))
+
     browser, width, height = SuiteDao.get_settings_for_suite(suite_id)
     suite_name, description = SuiteDao.get_suite(suite_id)
 
@@ -182,9 +188,10 @@ def change_baseline(suite_id, test_id, run_id, name):
     baseline_path = os.path.join('.'+basedir, str(test_id), 'baseline')
     newfile = os.path.join(testpath, name+'.png')
     baseline_file = os.path.join(baseline_path, name+'.png')
+    print(newfile)
     if os.path.isfile(newfile):
         copyfile(newfile, baseline_file)
     return "OK"
 
-app.run(host="0.0.0.0", port=8080, debug=True)
+app.run(host="0.0.0.0", port=8060, debug=True)
 

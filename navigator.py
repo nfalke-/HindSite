@@ -175,7 +175,7 @@ class Navigator(object):
         element = self.browser.find_element_by_css_selector(css_selector)
         self.last_clicked_on = element
         self.video.resume()
-        self._highlight("background: green; border: 2px solid red;", element)
+        self._highlight("background: green; border: 2px solid green;", element)
         self.video.pause()
         time.sleep(1)
         self.video.resume()

@@ -16,7 +16,8 @@
                         "sendRequest('/suites/" + row[1] + "/delete/')"
                     );
                     var dims = build_span(row[4]+'x'+row[5]);
-                    modified = [suite_name, browser, dims, blank, description, blank, blank, delete_button]
+                    var lastran = build_span(row[6]);
+                    modified = [suite_name, browser, dims, lastran, description, blank, blank, delete_button]
                     retVal.push(modified)
                 }
                 updateTable('suites', retVal);

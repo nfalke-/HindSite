@@ -143,3 +143,23 @@ def copy_suite(old_suite_id):
     for test_id in tests:
         TestDao.copy_test(new_suite_id, test_id)
 
+def get_most_recent_run_state(suite_id):
+    query = '''
+    select
+        start
+    from
+        runs
+    join
+        tests
+    using(testid)
+    join
+        suites
+    using(suiteid)
+    where
+        suiteid = %s
+    order by
+        runid desc
+    limit 1
+    '''
+    return get_from_db(query, (suite_id))
+

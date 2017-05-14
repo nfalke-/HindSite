@@ -1,6 +1,6 @@
 db_auth = {
     "host": "localhost",
     "user": "diffmaster",
-    "passwd": "hunter2@",
-    "db": "hindsite"
+    "passwd": "hunter2",
+    "db": "sitediff"
 }

@@ -70,6 +70,15 @@ def delete_steps_from_test(testid):
     '''
     write_to_db(query, (testid))
 
+def update_name(testid, name):
+    query = '''update
+        tests
+    set testname = %s
+    where
+        testid = %s
+    '''
+    write_to_db(query, (name, testid))
+
 def add_steps_to_test(testid, steps):
     delete_steps_from_test(testid)
     query = '''insert into
@@ -78,7 +87,6 @@ def add_steps_to_test(testid, steps):
         (%s, %s, %s, %s, %s, %s, %s)'''
     steps = tuple((testid, stepnumber)+tuple(i for i in step) for stepnumber, step in enumerate(steps, 1))
     write_many_to_db(query, steps)
-
 
 def copy_test(new_suite_id, old_test_id):
     new_name = get_name_from_id(old_test_id)+'{}'
@@ -115,3 +123,4 @@ def delete_test(test_id):
         testid = %s
     '''
     write_to_db(query, (test_id))
+
