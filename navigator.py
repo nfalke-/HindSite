@@ -55,26 +55,26 @@ class Navigator(object):
             'visit': self._visit,
             'click': self._click,
             'import': self._import,
-            'insert': self._insert,
+            'input': self._insert,
             'sleep': self._sleep,
             'refresh': self._refresh,
             'execute': self._execute,
+            'assert': self._assert,
         }
         makedir(self.directory)
         makedir(self.baseline)
         self.video = Video(os.path.join(self.directory, "video"), 0, 0, width, height)
 
-    def _highlight(self, element):
+    def _highlight(self, style, element):
         driver = element._parent
         def apply_style(s):
             driver.execute_script("arguments[0].setAttribute('style', arguments[1]);", element, s)
         original_style = element.get_attribute('style')
         for i in range(2):
-            time.sleep(1)
-            apply_style("background: yellow; border: 2px solid red;")
-            time.sleep(1)
+            time.sleep(.5)
+            apply_style(style)
+            time.sleep(.5)
             apply_style(original_style)
-        time.sleep(1)
 
     def _count_diff(self, image):
         black, total = 0, 0
@@ -163,12 +163,23 @@ class Navigator(object):
         element = self.browser.find_element_by_css_selector(css_selector)
         self.last_clicked_on = element
         self.video.resume()
-        self._highlight(element)
+        self._highlight("background: yellow; border: 2px solid red;", element)
         self.video.pause()
         element.click()
-        time.sleep(2)
+        time.sleep(1)
         self.video.resume()
-        time.sleep(2)
+        time.sleep(1)
+        self.video.pause()
+
+    def _assert(self, css_selector):
+        element = self.browser.find_element_by_css_selector(css_selector)
+        self.last_clicked_on = element
+        self.video.resume()
+        self._highlight("background: green; border: 2px solid red;", element)
+        self.video.pause()
+        time.sleep(1)
+        self.video.resume()
+        time.sleep(1)
         self.video.pause()
 
     def _insert(self, text):

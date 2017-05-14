@@ -19,7 +19,7 @@
                         var screenshot_image = build_image({{test_id}}, {{run_id}}, row[6]);
                         var accept_button = build_button("Accept as Baseline",
                         "sendRequest('/suites/{{suite_id}}" + "/tests/{{test_id}}" + 
-                        "/runs/{{run_id}}" + "/baseline/" + row[6] + ".png')"
+                        "/runs/{{run_id}}" + "/baseline/" + row[6] + "')"
                         );
                         screenshot.append(screenshot_image);
                         screenshot.append(accept_button);
