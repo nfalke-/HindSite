@@ -119,11 +119,15 @@ class Navigator(object):
 
         x, y = 0, 0
         while y < total_height:
+            y_offset = y
+            if y + client_height > total_height:
+                y_offset = total_height - client_height
             while x < total_width:
                 self.browser.execute_script("window.scrollTo({0}, {1})".format(x, y))
                 time.sleep(.2)
                 partial_screenshot = self._take_partial_screenshot()
-                full_screenshot.paste(partial_screenshot, (x, y))
+
+                full_screenshot.paste(partial_screenshot, (x, y_offset))
                 x += client_width
             x = 0
             y += client_height
