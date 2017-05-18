@@ -13,12 +13,10 @@ from camera import Video
 from pyvirtualdisplay import Display
 from PIL import Image, ImageChops, ImageDraw
 from Daos import TestDao, RunDao
+from config import config
 
-BASE = './static/files'
-BASELINE_DIR = 'baseline'
-PATH_TO_DRIVERS = 'drivers'
 
-os.environ['PATH'] += ':'+os.path.join(os.getcwd(), PATH_TO_DRIVERS)
+os.environ['PATH'] += ':'+os.path.join(os.getcwd(), config.PATH_TO_DRIVERS)
 
 BROWSERS = {
     'chrome': webdriver.Chrome,
@@ -31,8 +29,8 @@ class Navigator(object):
     def __init__(self, test_id, width, height, wait_time=5, browser=None):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
         self.run_id = RunDao.add_run(test_id, now)
-        self.directory = os.path.join(BASE, str(test_id), str(self.run_id))
-        self.baseline = os.path.join(BASE, str(test_id), BASELINE_DIR)
+        self.directory = os.path.join(config.BASE, str(test_id), str(self.run_id))
+        self.baseline = os.path.join(config.BASE, str(test_id), config.BASELINE_DIR)
         self.wait_time = wait_time
         self.task_list = TestDao.get_steps_for_test(test_id)
         self.test_passed = True
@@ -40,17 +38,18 @@ class Navigator(object):
         self.vdisplay = Display(backend='xvfb', size=(width, height))
         self.vdisplay.start()
         if not browser or browser.lower() not in BROWSERS.keys():
-            browser = webdriver.Firefox()
+            self.browser = webdriver.Firefox()
         else:
-            browser = BROWSERS[browser.lower()]()
+            self.browser = BROWSERS[browser.lower()]()
 
         self.last_clicked_on = None
         self.step_screenshot_passed = None
         self.step_passed = None
         self.screenshot_percent = None
-        self.browser = browser
-        self.browser.set_window_size(width, height)
+
         self.browser.set_window_position(0, 0)
+        self.browser.set_window_size(width, height)
+        self.browser.maximize_window
         self.commands = {
             'visit': self._visit,
             'click': self._click,

@@ -4,9 +4,9 @@ from multiprocessing import Process
 import os
 from Daos import SuiteDao, TestDao, RunDao
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+from config import config
 
-app = Flask("app")
-basedir = '/static/files'
+app = Flask(__name__)
 
 from decimal import Decimal
 def json_safe(value):
@@ -43,7 +43,11 @@ def view_run(suite_id, test_id, run_id):
 def index_api():
     suites = []
     for suite in SuiteDao.list_suites():
-        suites += [suite + SuiteDao.get_most_recent_run_state(suite[1])]
+        suites += [
+            suite +
+            (SuiteDao.get_most_recent_run_state(suite[1]) or ('never', )) +
+            (SuiteDao.get_test_count(suite[1]) or (0, ))
+        ]
     return jsonify(suites)
 
 @app.route('/suites/<suite_id>/data/', methods=['GET', 'POST'])
@@ -184,8 +188,8 @@ def delete_test(suite_id, test_id):
 
 @app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/baseline/<name>/', methods=['GET', 'POST'])
 def change_baseline(suite_id, test_id, run_id, name):
-    testpath = os.path.join(*(map(str, ['.'+basedir, test_id, run_id])))
-    baseline_path = os.path.join('.'+basedir, str(test_id), 'baseline')
+    testpath = os.path.join(*(map(str, [config.BASE, test_id, run_id])))
+    baseline_path = os.path.join(config.BASE, str(test_id), 'baseline')
     newfile = os.path.join(testpath, name+'.png')
     baseline_file = os.path.join(baseline_path, name+'.png')
     print(newfile)
@@ -193,5 +197,6 @@ def change_baseline(suite_id, test_id, run_id, name):
         copyfile(newfile, baseline_file)
     return "OK"
 
-app.run(host="0.0.0.0", port=8060, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)
 

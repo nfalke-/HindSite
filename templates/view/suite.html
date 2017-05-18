@@ -10,12 +10,12 @@
                     row = table_json[i]
                     var test_name = build_link("/suites/{{suite_id}}/tests/" + row[1], row[0]);
                     var test_passed = build_span(row[2]);
-                    if (row[2] == '') {
+                    if (row[2] === '') {
                         test_passed = build_span("pending...");
                     }
                     var screenshot_passed = build_span(row[3]);
-                    if (row[3] = '') {
-                        test_passed = build_span("pending...");
+                    if (row[3] === '') {
+                        screenshot_passed = build_span("pending...");
                     }
                     var last_ran = build_span(row[4]);
                     var delete_button = build_button("x", 

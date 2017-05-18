@@ -163,3 +163,17 @@ def get_most_recent_run_state(suite_id):
     '''
     return get_from_db(query, (suite_id))
 
+def get_test_count(suite_id):
+    query = '''
+    select
+        count(*)
+    from
+        tests
+    join
+        suites
+    using(suiteid)
+    where
+        suiteid = %s
+    '''
+    return get_from_db(query, (suite_id))
+

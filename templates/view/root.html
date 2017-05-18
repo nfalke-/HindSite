@@ -17,7 +17,8 @@
                     );
                     var dims = build_span(row[4]+'x'+row[5]);
                     var lastran = build_span(row[6]);
-                    modified = [suite_name, browser, dims, lastran, description, blank, blank, delete_button]
+                    var test_count = build_span(row[7]);
+                    modified = [suite_name, browser, dims, lastran, description, test_count, blank, delete_button]
                     retVal.push(modified)
                 }
                 updateTable('suites', retVal);
