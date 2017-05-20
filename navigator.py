@@ -120,16 +120,18 @@ class Navigator(object):
         return new
 
     def _take_fullpage_screenshot(self):
-        total_width = self.browser.execute_script("return document.body.offsetWidth")
-        total_height = self.browser.execute_script("return document.body.parentNode.scrollHeight")
+        total_width = self.browser.execute_script("return (document.width !== undefined) ? document.width : document.body.offsetWidth")
+        total_height = self.browser.execute_script("return (document.height !== undefined) ? document.height : document.body.offsetHeight")
         partial_screenshot = self._take_partial_screenshot()
         client_width, client_height = partial_screenshot.size
         total_width = max(total_width, client_width)
         total_height = max(total_height, client_height)
         full_screenshot = Image.new('RGBA', (total_width, total_height))
+        full_screenshot.paste(partial_screenshot, (0, 0))
 
         x, y = 0, 0
         while y < total_height:
+            y += client_height
             y_offset = y
             if y + client_height > total_height:
                 y_offset = total_height - client_height
@@ -137,11 +139,9 @@ class Navigator(object):
                 self.browser.execute_script("window.scrollTo({0}, {1})".format(x, y))
                 time.sleep(.2)
                 partial_screenshot = self._take_partial_screenshot()
-
                 full_screenshot.paste(partial_screenshot, (x, y_offset))
                 x += client_width
             x = 0
-            y += client_height
         self.browser.execute_script("window.scrollTo({0}, {1})".format(0, 0))
         return full_screenshot
 
