@@ -1,8 +1,11 @@
-from utils import get_from_db, write_to_db, write_many_to_db
+'''
+Data Access module for suites
+'''
+from utils import get_from_db, write_to_db
 from Daos import TestDao
 
-
 def get_suite(suite_id):
+    '''return the suite name and description from the db using the suite id'''
     query = '''
     select
         suitename, description
@@ -16,8 +19,8 @@ def get_suite(suite_id):
         return rows[0]
     return None
 
-
 def get_name_from_id(suite_id):
+    '''get the name of the suite from the suite id'''
     query = '''
     select
         suitename
@@ -33,6 +36,7 @@ def get_name_from_id(suite_id):
     return None
 
 def get_description_from_id(suite_id):
+    '''get the description of the suite using the suite id'''
     query = '''
     select
         description
@@ -48,6 +52,7 @@ def get_description_from_id(suite_id):
     return None
 
 def list_suites():
+    '''list out all the suites in the database'''
     query = '''
     select
         suitename, suiteid, description, browser, width, height
@@ -60,6 +65,7 @@ def list_suites():
     return get_from_db(query)
 
 def add_config(suite_id, browser, width, height):
+    '''add configuration to a suite'''
     query = """insert into
         suite_config (suiteid, browser, width, height)
     values
@@ -67,6 +73,7 @@ def add_config(suite_id, browser, width, height):
     suite_id = write_to_db(query, (suite_id, browser, width, height))
 
 def add_suite(name, description, browser, width, height):
+    '''add a suite to the database'''
     query = """insert into
         suites (suitename, description)
     values
@@ -76,6 +83,7 @@ def add_suite(name, description, browser, width, height):
     return suite_id
 
 def delete_suite(suite_id):
+    '''delete a suite from the database'''
     query = """delete from
         suites
     where
@@ -84,6 +92,7 @@ def delete_suite(suite_id):
     write_to_db(query, (suite_id))
 
 def get_settings_for_suite(suiteid):
+    '''get the configuration settings for a suite from the database'''
     query = '''
     select
         browser, width, height
@@ -98,6 +107,7 @@ def get_settings_for_suite(suiteid):
     return None
 
 def update_suite_settings(suite_id, browser, width, height):
+    '''update the configuration settings for a suite'''
     query = """
     update
         suite_config
@@ -111,6 +121,7 @@ def update_suite_settings(suite_id, browser, width, height):
     write_to_db(query, (browser, width, height, suite_id))
 
 def update_suite(suite_id, name, description):
+    '''update a suite name and description'''
     query = """
     update
         suites
@@ -119,11 +130,11 @@ def update_suite(suite_id, name, description):
         description = %s
     where
         suiteid = %s"""
-    print(description)
     write_to_db(query, (name, description, suite_id))
 
 
 def copy_suite(old_suite_id):
+    '''copy an entire suite recursively (all tests and steps get copied as well)'''
     new_name = get_name_from_id(old_suite_id)+'{}'
     name_list = {i[0] for i in list_suites()}
     end = ''
@@ -144,6 +155,7 @@ def copy_suite(old_suite_id):
         TestDao.copy_test(new_suite_id, test_id)
 
 def get_most_recent_run_state(suite_id):
+    '''get the most recent run from the most recently ran test'''
     query = '''
     select
         start
@@ -164,6 +176,7 @@ def get_most_recent_run_state(suite_id):
     return get_from_db(query, (suite_id))
 
 def get_test_count(suite_id):
+    '''count the tests in a suite'''
     query = '''
     select
         count(*)
@@ -176,4 +189,3 @@ def get_test_count(suite_id):
         suiteid = %s
     '''
     return get_from_db(query, (suite_id))
-

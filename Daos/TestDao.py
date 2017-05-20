@@ -1,7 +1,11 @@
+'''
+Data access module for runs
+'''
 from utils import get_from_db, write_to_db, write_many_to_db
 from utils import task
 
 def get_name_from_id(test_id):
+    '''uses a test id to get the name of a test'''
     query = '''
     select
         testname
@@ -17,6 +21,7 @@ def get_name_from_id(test_id):
     return None
 
 def list_tests(suite_id):
+    '''uses a suite id to list out all tests in that suite'''
     query = '''
     select
         testname, testid
@@ -28,6 +33,7 @@ def list_tests(suite_id):
     return get_from_db(query, (suite_id, ))
 
 def get_most_recent_run_state(testid):
+    '''gets the state of the most recent run for a test'''
     query = '''
     select
         passed, screenshot_passed, start
@@ -42,8 +48,9 @@ def get_most_recent_run_state(testid):
     return get_from_db(query, (testid))
 
 def get_steps_for_test(testid):
+    '''returns all the steps in a test'''
     query = '''select
-        action, args, screenshot, screenshot_name, threshold
+        action, optional, args, screenshot, screenshot_name, threshold
     from
         steps
     left join
@@ -56,6 +63,7 @@ def get_steps_for_test(testid):
     return [task(*i) for i in get_from_db(query, (testid))]
 
 def add_test(suiteid, name):
+    '''adds a test to the database'''
     query = """insert into
         tests(testname, suiteid)
     values
@@ -63,6 +71,10 @@ def add_test(suiteid, name):
     return write_to_db(query, (name, suiteid))
 
 def delete_steps_from_test(testid):
+    '''
+    deletes all steps from a test
+    (used when editing steps, because it's easier than updating each step)
+    '''
     query = '''delete from
         steps
     where
@@ -71,6 +83,7 @@ def delete_steps_from_test(testid):
     write_to_db(query, (testid))
 
 def update_name(testid, name):
+    '''changes the name of a test in the database'''
     query = '''update
         tests
     set testname = %s
@@ -80,15 +93,18 @@ def update_name(testid, name):
     write_to_db(query, (name, testid))
 
 def add_steps_to_test(testid, steps):
+    '''adds steps to a test (deletes all of the previous steps first)'''
     delete_steps_from_test(testid)
     query = '''insert into
         steps (testid, stepnumber, action, args, screenshot, screenshot_name, threshold)
     values
         (%s, %s, %s, %s, %s, %s, %s)'''
-    steps = tuple((testid, stepnumber)+tuple(i for i in step) for stepnumber, step in enumerate(steps, 1))
+    steps = tuple((testid, stepnumber)+tuple(i for i in step)
+                  for stepnumber, step in enumerate(steps, 1))
     write_many_to_db(query, steps)
 
 def copy_test(new_suite_id, old_test_id):
+    '''copies a test to a new suite (or the same suite)'''
     new_name = get_name_from_id(old_test_id)+'{}'
     name_list = {i[0] for i in list_tests(new_suite_id)}
     end = ''
@@ -105,17 +121,19 @@ def copy_test(new_suite_id, old_test_id):
     add_steps_to_test(new_test_id, get_steps_for_test(old_test_id))
 
 def get_full_test_info(suite_id):
+    '''lists out all testsm and includes the most recent run state for each test'''
     test_base_info = list_tests(suite_id)
     tests = []
     for test in test_base_info:
         run_state = get_most_recent_run_state(test[1])
-        if len(run_state) > 0:
+        if run_state:
             tests.append(test + run_state[0])
         else:
             tests.append(test + (0, 0, 'never'))
     return tests
 
 def delete_test(test_id):
+    '''recursively delete an entire test'''
     query = '''
     delete from
         tests
@@ -123,4 +141,3 @@ def delete_test(test_id):
         testid = %s
     '''
     write_to_db(query, (test_id))
-

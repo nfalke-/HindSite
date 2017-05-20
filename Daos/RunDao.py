@@ -1,6 +1,12 @@
-from utils import get_from_db, write_to_db, write_many_to_db
+'''
+Data access module for runs
+'''
+from utils import get_from_db, write_to_db
 
 def get_runs(testid):
+    '''
+    gets all runs using a test id
+    '''
     query = '''
     select
         runid, start, end, passed, screenshot_passed
@@ -12,6 +18,9 @@ def get_runs(testid):
     return get_from_db(query, (testid))
 
 def get_steps_for_run(runid):
+    '''
+    gets all steps for a run using a run id
+    '''
     query = '''
     select
         action, args, passed, take_screenshot, screenshot_percentage, screenshot_passed, screenshot_name
@@ -23,6 +32,10 @@ def get_steps_for_run(runid):
     return get_from_db(query, (runid))
 
 def add_run(testid, start):
+    '''
+    adds a run to the database
+    used when a test starts
+    '''
     query = '''
     insert into
         runs(testid, start)
@@ -32,6 +45,10 @@ def add_run(testid, start):
     return write_to_db(query, (testid, start))
 
 def update_run(runid, end, passed, screenshot_passed):
+    '''
+    updates a run in the database
+    used after a test completes
+    '''
     query = '''
     update runs
     set
@@ -43,6 +60,9 @@ def update_run(runid, end, passed, screenshot_passed):
 
 def add_run_step(runid, action, args, passed, take_screenshot,
                  screenshot_percent, screenshot_passed, screenshot_name):
+    '''
+    adds a step to a run
+    '''
     query = '''
     insert into
         run_step(runid, action, args, passed, take_screenshot,
@@ -52,4 +72,3 @@ def add_run_step(runid, action, args, passed, take_screenshot,
     '''
     return write_to_db(query, (runid, action, args, passed, take_screenshot,
                                screenshot_percent, screenshot_passed, screenshot_name))
-
