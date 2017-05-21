@@ -1,5 +1,7 @@
 *.pyc
 __pycache__
 drivers
+config.py
 static/files
 tmp
+
