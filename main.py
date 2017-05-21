@@ -12,6 +12,14 @@ from navigator import Navigator
 
 app = Flask(__name__)
 
+
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 def json_safe(value):
     '''converts values to json safe values'''
     if isinstance(value, Decimal):
@@ -98,7 +106,7 @@ def add_suite():
             description = request.form.get('description')
             width = request.form.get('width')
             height = request.form.get('height')
-            SuiteDao.add_suite(name, description, browser, width, height)
+            SuiteDao.add_suite(name, description, browser, width, height, False, 0)
             return redirect(url_for('index'))
     return render_template('add/suite.html')
 
@@ -146,18 +154,28 @@ def edit_suite(suite_id):
         browser = request.form.get('browser')
         width = request.form.get('width')
         height = request.form.get('height')
+        if SuiteDao.get_schedule_config(suite_id)[1]:
+            print("config exists")
+        scheduled = request.form.get('scheduled')
+        interval = request.form.get('interval')
+        if is_int(interval):
+            if int(interval) > 0:
+                SuiteDao.update_schedule_config(suite_id, bool(scheduled), int(interval))
         SuiteDao.update_suite_settings(suite_id, browser, width, height)
         SuiteDao.update_suite(suite_id, suite_name, description)
         return redirect(url_for('view_suite', suite_id=suite_id))
     browser, width, height = SuiteDao.get_settings_for_suite(suite_id)
     suite_name, description = SuiteDao.get_suite(suite_id)
+    scheduled, interval = SuiteDao.get_schedule_config(suite_id)
     return render_template(
         'edit/suite.html',
         suite_name=suite_name,
         description=description,
         browser=browser,
         width=width,
-        height=height
+        height=height,
+        scheduled=scheduled,
+        interval=interval
         )
 
 #run

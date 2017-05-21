@@ -70,9 +70,18 @@ def add_config(suite_id, browser, width, height):
         suite_config (suiteid, browser, width, height)
     values
         (%s, %s, %s, %s)"""
-    suite_id = write_to_db(query, (suite_id, browser, width, height))
+    return write_to_db(query, (suite_id, browser, width, height))
 
-def add_suite(name, description, browser, width, height):
+def add_schedule(suite_id, active, period):
+    if not active:
+        period = 0
+    query = """insert into
+        scheduledSuite (suiteid, active, period, nextrun)
+    values
+        (%s, %s, %s, now() + interval %s minute)"""
+    return write_to_db(query, (suite_id, active, period, period))
+
+def add_suite(name, description, browser, width, height, active, period):
     '''add a suite to the database'''
     query = """insert into
         suites (suitename, description)
@@ -80,6 +89,7 @@ def add_suite(name, description, browser, width, height):
         (%s, %s)"""
     suite_id = write_to_db(query, (name, description))
     add_config(suite_id, browser, width, height)
+    add_schedule(suite_id, active, period)
     return suite_id
 
 def delete_suite(suite_id):
@@ -132,7 +142,6 @@ def update_suite(suite_id, name, description):
         suiteid = %s"""
     write_to_db(query, (name, description, suite_id))
 
-
 def copy_suite(old_suite_id):
     '''copy an entire suite recursively (all tests and steps get copied as well)'''
     new_name = get_name_from_id(old_suite_id)+'{}'
@@ -148,9 +157,10 @@ def copy_suite(old_suite_id):
                 end = ' (copy {})'.format(copy_number)
     new_name = new_name.format(end)
     browser, width, height = get_settings_for_suite(old_suite_id)
+    active, period = get_schedule_config(old_suite_id)
     description = get_description_from_id(old_suite_id)
     tests = [i[1] for i in TestDao.list_tests(old_suite_id)]
-    new_suite_id = add_suite(new_name, description, browser, width, height)
+    new_suite_id = add_suite(new_name, description, browser, width, height, active, period)
     for test_id in tests:
         TestDao.copy_test(new_suite_id, test_id)
 
@@ -201,13 +211,14 @@ def get_suites_scheduled_later_than_now():
         scheduledSuite
     where
         nextrun < now()
+        and active
     '''
     return get_from_db(query)
 
 def schedule_next_suite(schedule_id):
     '''
     schedules a test to run either at the last scheduled time + the period,
-    or at now + the period\
+    or at now + the period
     '''
     query = '''
     update
@@ -223,16 +234,27 @@ def schedule_next_suite(schedule_id):
     '''
     return write_to_db(query, (schedule_id))
 
-def get_suite_schedule_configuration(suite_id):
-    '''
-    gets the configurable fields from a scheduled suite
-    '''
+def get_schedule_config(suite_id):
+    '''gets the configurable fields from a scheduled suite'''
     query = '''
     select
-        period
+        active, period
     from
         scheduledSuite
     where
         suiteid = %s
     '''
-    return get_from_db(query, (suite_id))
+    return get_from_db(query, (suite_id))[0] or (False, 0)
+
+def update_schedule_config(suite_id, active, period):
+    '''gets the configurable fields from a scheduled suite'''
+    query = '''
+    update
+        scheduledSuite
+    set
+        active=%s, period=%s
+    where
+        suiteid = %s
+    '''
+    return write_to_db(query, (active, period, suite_id)) or (False, 0)
+

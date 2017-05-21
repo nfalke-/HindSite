@@ -27,13 +27,33 @@
                             </select>
                         </td>
                         <td>
-                            <input name="width" value="{{width}}"></textarea>
+                            <input name="width" value="{{width}}">
                         </td>
                         <td>
-                            <input name="height" value="{{height}}"></textarea>
+                            <input name="height" value="{{height}}">
                         </td>
                     </tbody>
                 </table>
+                <br>
+                <table id="StepTable" border="1">
+                    <thead>
+                        <tr>
+                            <td>scheduled</td>
+                            <td>interval</td>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="scheduled"
+                            {% if scheduled %} checked {% endif %}
+                            value="scheduled" />
+                        </td>
+                        <td>
+                            <input name="interval" value="{{interval}}" placeholder="minutes">
+                        </td>
+                    </tr>
+                </table>
+                <br>
                 <input type=submit value=Submit >
             </form>
         </div>
