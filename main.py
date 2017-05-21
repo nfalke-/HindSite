@@ -239,4 +239,4 @@ def change_baseline(suite_id, test_id, run_id, name):
     return "OK"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host=config.HOST, port=config.PORT, debug=True)
