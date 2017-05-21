@@ -12,7 +12,6 @@ from navigator import Navigator
 
 app = Flask(__name__)
 
-
 def is_int(s):
     try:
         int(s)
