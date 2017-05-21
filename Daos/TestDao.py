@@ -141,3 +141,51 @@ def delete_test(test_id):
         testid = %s
     '''
     write_to_db(query, (test_id))
+
+def get_tests_scheduled_later_than_now():
+    '''
+    gets tests that are scheduled to run later than now
+    '''
+    query = '''
+    select
+        id, suiteid, testid
+    from
+        scheduledTest
+    where
+        nextrun < now()
+    '''
+    return get_from_db(query)
+
+def schedule_next_test(schedule_id):
+    '''
+    schedules a test to run either at the last scheduled time + the period,
+    or at now + the period\
+    '''
+    query = '''
+    update
+        scheduledTest
+    set
+        nextrun = if(
+            nextrun + interval period minute > now(),
+            nextrun + interval period minute,
+            now() + interval period minute
+        )
+    where
+        id = %s
+    '''
+    return write_to_db(query, (schedule_id))
+
+def get_test_schedule_configuration(suite_id, test_id):
+    '''
+    gets the configurable fields from a scheduled test
+    '''
+    query = '''
+    select
+        period
+    from
+        scheduledSuite
+    where
+        suiteid = %s
+        and testid = %s
+    '''
+    return get_from_db(query, (suite_id, test_id))

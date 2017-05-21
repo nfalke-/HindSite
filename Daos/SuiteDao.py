@@ -189,3 +189,50 @@ def get_test_count(suite_id):
         suiteid = %s
     '''
     return get_from_db(query, (suite_id))
+
+def get_suites_scheduled_later_than_now():
+    '''
+    gets tests and suites that are scheduled to run later than now
+    '''
+    query = '''
+    select
+        id, suiteid
+    from
+        scheduledSuite
+    where
+        nextrun < now()
+    '''
+    return get_from_db(query)
+
+def schedule_next_suite(schedule_id):
+    '''
+    schedules a test to run either at the last scheduled time + the period,
+    or at now + the period\
+    '''
+    query = '''
+    update
+        scheduledSuite
+    set
+        nextrun = if(
+            nextrun + interval period minute > now(),
+            nextrun + interval period minute,
+            now() + interval period minute
+        )
+    where
+        id = %s
+    '''
+    return write_to_db(query, (schedule_id))
+
+def get_suite_schedule_configuration(suite_id):
+    '''
+    gets the configurable fields from a scheduled suite
+    '''
+    query = '''
+    select
+        period
+    from
+        scheduledSuite
+    where
+        suiteid = %s
+    '''
+    return get_from_db(query, (suite_id))
