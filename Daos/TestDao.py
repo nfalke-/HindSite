@@ -62,13 +62,24 @@ def get_steps_for_test(testid):
         stepnumber'''
     return [task(*i) for i in get_from_db(query, (testid))]
 
-def add_test(suiteid, name):
+def add_schedule(suite_id, test_id, active, period):
+    if not active:
+        period = 0
+    query = """insert into
+        scheduledTest (suiteid, testid, active, period, nextrun)
+    values
+        (%s, %s, %s, %s, now() + interval %s minute)"""
+    return write_to_db(query, (suite_id, test_id, active, period, period))
+
+def add_test(suiteid, name, active, period):
     '''adds a test to the database'''
     query = """insert into
         tests(testname, suiteid)
     values
         (%s, %s)"""
-    return write_to_db(query, (name, suiteid))
+    test_id = write_to_db(query, (name, suiteid))
+    add_schedule(suite_id, test_id, active, period)
+    return test_id
 
 def delete_steps_from_test(testid):
     '''
@@ -175,7 +186,7 @@ def schedule_next_test(schedule_id):
     '''
     return write_to_db(query, (schedule_id))
 
-def get_test_schedule_configuration(suite_id, test_id):
+def get_schedule_config(suite_id, test_id):
     '''
     gets the configurable fields from a scheduled test
     '''
@@ -183,9 +194,23 @@ def get_test_schedule_configuration(suite_id, test_id):
     select
         period
     from
-        scheduledSuite
+        scheduledTest
     where
         suiteid = %s
         and testid = %s
     '''
     return get_from_db(query, (suite_id, test_id))
+
+def update_schedule_config(suite_id, test_id, active, period):
+    '''gets the configurable fields from a scheduled suite'''
+    query = '''
+    update
+        scheduledTest
+    set
+        active=%s, period=%s
+    where
+        suiteid = %s
+        and testid = %s
+    '''
+    return write_to_db(query, (active, period, suite_id, test_id)) or (False, 0)
+

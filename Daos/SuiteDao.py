@@ -257,4 +257,3 @@ def update_schedule_config(suite_id, active, period):
         suiteid = %s
     '''
     return write_to_db(query, (active, period, suite_id)) or (False, 0)
-
