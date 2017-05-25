@@ -118,7 +118,9 @@ def add_test(suite_id):
     '''adds a new test to the database'''
     if request.method == 'POST':
         if request.form.get('testname'):
-            TestDao.add_test(suite_id, request.form.get('testname'))
+            active = False
+            period = 0
+            TestDao.add_test(suite_id, request.form.get('testname'), active, period)
             return redirect(url_for('view_suite', suite_id=suite_id))
     return render_template('add/test.html')
 
@@ -128,11 +130,13 @@ def edit_test(suite_id, test_id):
     '''edit a test'''
     if request.method == 'POST':
         actions = request.form.getlist('action')
+        optional = [False]*len(actions)
         checked = set(map(int, request.form.getlist('screenshot')))
         screenshots = [i in checked for i in range(1, len(actions)+1)]
         name = request.form.get('name')
         steps = zip(
             request.form.getlist('action'),
+            optional,
             request.form.getlist('arguments'),
             screenshots,
             request.form.getlist('screenshot_name'),
@@ -145,7 +149,7 @@ def edit_test(suite_id, test_id):
     steps = TestDao.get_steps_for_test(test_id)
     steps = [(i, ) + step for i, step in enumerate(steps, 1)]
     if not steps:
-        steps = [(1, '', '', False, '', .10000)]
+        steps = [(1, '', False, '', False, '', .10000)]
     return render_template('edit/test.html', steps=steps, name=name)
 
 @app.route('/suites/<suite_id>/edit/', methods=['GET', 'POST'])

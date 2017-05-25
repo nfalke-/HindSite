@@ -62,13 +62,24 @@ def get_steps_for_test(testid):
         stepnumber'''
     return [task(*i) for i in get_from_db(query, (testid))]
 
-def add_test(suiteid, name):
+def add_schedule(suite_id, test_id, active, period):
+    if not active:
+        period = 0
+    query = """insert into
+        scheduledTest (suiteid, testid, active, period, nextrun)
+    values
+        (%s, %s, %s, %s, now() + interval %s minute)"""
+    return write_to_db(query, (suite_id, test_id, active, period, period))
+
+def add_test(suite_id, name, active, period):
     '''adds a test to the database'''
     query = """insert into
         tests(testname, suiteid)
     values
         (%s, %s)"""
-    return write_to_db(query, (name, suiteid))
+    test_id = write_to_db(query, (name, suite_id))
+    add_schedule(suite_id, test_id, active, period)
+    return test_id
 
 def delete_steps_from_test(testid):
     '''
@@ -96,9 +107,9 @@ def add_steps_to_test(testid, steps):
     '''adds steps to a test (deletes all of the previous steps first)'''
     delete_steps_from_test(testid)
     query = '''insert into
-        steps (testid, stepnumber, action, args, screenshot, screenshot_name, threshold)
+        steps (testid, stepnumber, action, optional, args, screenshot, screenshot_name, threshold)
     values
-        (%s, %s, %s, %s, %s, %s, %s)'''
+        (%s, %s, %s, %s, %s, %s, %s, %s)'''
     steps = tuple((testid, stepnumber)+tuple(i for i in step)
                   for stepnumber, step in enumerate(steps, 1))
     write_many_to_db(query, steps)
@@ -117,7 +128,7 @@ def copy_test(new_suite_id, old_test_id):
                 copy_number += 1
                 end = ' (copy {})'.format(copy_number)
     new_name = new_name.format(end)
-    new_test_id = add_test(new_suite_id, new_name)
+    new_test_id = add_test(new_suite_id, new_name, False, 0)
     add_steps_to_test(new_test_id, get_steps_for_test(old_test_id))
 
 def get_full_test_info(suite_id):
@@ -175,7 +186,7 @@ def schedule_next_test(schedule_id):
     '''
     return write_to_db(query, (schedule_id))
 
-def get_test_schedule_configuration(suite_id, test_id):
+def get_schedule_config(suite_id, test_id):
     '''
     gets the configurable fields from a scheduled test
     '''
@@ -183,9 +194,23 @@ def get_test_schedule_configuration(suite_id, test_id):
     select
         period
     from
-        scheduledSuite
+        scheduledTest
     where
         suiteid = %s
         and testid = %s
     '''
     return get_from_db(query, (suite_id, test_id))
+
+def update_schedule_config(suite_id, test_id, active, period):
+    '''gets the configurable fields from a scheduled suite'''
+    query = '''
+    update
+        scheduledTest
+    set
+        active=%s, period=%s
+    where
+        suiteid = %s
+        and testid = %s
+    '''
+    return write_to_db(query, (active, period, suite_id, test_id)) or (False, 0)
+
