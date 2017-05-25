@@ -8,7 +8,11 @@ import os
 from Daos import SuiteDao, TestDao, RunDao
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from config import config
-from navigator import Navigator
+import navigator
+from redis import Redis
+from rq import Queue
+
+q = Queue(connection=Redis())
 
 app = Flask(__name__)
 
@@ -182,8 +186,7 @@ def edit_suite(suite_id):
 def run_test(suite_id, test_id):
     '''run a test'''
     browser, width, height = SuiteDao.get_settings_for_suite(suite_id)
-    navigator = Navigator(test_id, (width, height), browser=browser)
-    Process(target=navigator.run).start()
+    q.enqueue(navigator.run_test, test_id, (width, height), browser)
     return redirect(url_for('view_test', suite_id=suite_id, test_id=test_id))
 
 @app.route('/suites/<suite_id>/run/', methods=['GET', 'POST'])

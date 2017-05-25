@@ -15,6 +15,11 @@ from config import config
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
+def run_test(test_id, size, browser):
+    '''run a test'''
+    navigator = Navigator(test_id, (size), browser=browser)
+    navigator.run()
+
 
 os.environ['PATH'] += ':'+os.path.join(os.getcwd(), config.PATH_TO_DRIVERS)
 
