@@ -3,7 +3,8 @@
 <body bgcolor="#D0D0D0">
     <center>
         <div id="StepTableDiv">
-            <form method=post enctype=multipart/form-data onsubmit="activateAll()">
+            <form method=post enctype=multipart/form-data
+             onsubmit="activateAll()" action="{{ url_for('post_edit_test', suite_id=suite_id, test_id=test_id) }}">
                 <span>
                     Name:
                     <input size=40 type="text" name="name" placeholder="test name" value="{{name}}"/>

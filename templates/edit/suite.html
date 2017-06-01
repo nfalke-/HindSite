@@ -3,7 +3,8 @@
 <body bgcolor="#D0D0D0">
     <center>
         <div id="StepTableDiv">
-            <form method=post enctype=multipart/form-data onsubmit="activateAll()">
+            <form method=post enctype=multipart/form-data
+             onsubmit="activateAll()" action="{{ url_for('post_edit_suite', suite_id=suite_id) }}">
                 <table id="StepTable" border="1">
                     <thead>
                         <tr>
