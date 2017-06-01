@@ -6,11 +6,6 @@ from collections import namedtuple
 import MySQLdb
 from config import db_auth
 
-def makedir(dirname):
-    '''creates a directory if one doesn't already exist'''
-    if not os.path.isdir(dirname):
-        os.makedirs(dirname)
-
 task = namedtuple('task', [
     'action',
     'is_optional',
@@ -21,8 +16,12 @@ task = namedtuple('task', [
     ])
 
 
+def makedir(dirname: str) -> str:
+    '''creates a directory if one doesn't already exist'''
+    if not os.path.isdir(dirname):
+        os.makedirs(dirname)
 
-def get_from_db(query, args=()):
+def get_from_db(query: str, args=()) -> tuple:
     '''
     gets rows from the db using a SELECT query
     '''
@@ -36,7 +35,7 @@ def get_from_db(query, args=()):
         return results
     return ()
 
-def write_to_db(query, args=()):
+def write_to_db(query: str, args=()) -> int:
     '''
     writes a row to the db using an INSERT or UPDATE query
     returns the last row affected
@@ -49,7 +48,7 @@ def write_to_db(query, args=()):
     database.commit()
     return cursor.lastrowid
 
-def write_many_to_db(query, args=()):
+def write_many_to_db(query: int, args=()) -> int:
     '''
     writes rows to the db using an INSERT or UPDATE query
     returns the last row affected
