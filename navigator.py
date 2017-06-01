@@ -14,7 +14,7 @@ from config import config
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
-def run_test(test_id, size, browser):
+def run_test(test_id: int, size: tuple, browser: str):
     '''run a test'''
     navigator = Navigator(test_id, (size), browser=browser)
     navigator.run()
