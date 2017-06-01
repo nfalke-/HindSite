@@ -8,7 +8,6 @@ import os
 import io
 import utils
 from camera import Video
-from pyvirtualdisplay import Display
 from PIL import Image, ImageChops, ImageDraw
 from Daos import TestDao, RunDao
 from config import config
@@ -41,8 +40,6 @@ class Navigator(object):
         self.task_list = TestDao.get_steps_for_test(test_id)
         self.test_passed = True
         self.test_screenshot_passed = True
-        self.vdisplay = Display(backend='xvfb', size=size)
-        self.vdisplay.start()
         if not browser or browser.lower() not in BROWSERS.keys():
             self.browser = webdriver.Firefox()
         else:
@@ -258,8 +255,7 @@ class Navigator(object):
             self._do_task(self.task_list.pop(0))
         self.video.resume()
         self.video.stop()
-        self.browser.close()
-        self.vdisplay.stop()
+        self.browser.quit()
         now = time.strftime('%Y-%m-%d %H:%M:%S')
         RunDao.update_run(self.run_id, now, self.test_passed, self.test_screenshot_passed)
 
