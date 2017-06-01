@@ -4,7 +4,7 @@ Data access module for runs
 from utils import get_from_db, write_to_db, write_many_to_db
 from utils import task
 
-def get_name_from_id(test_id):
+def get_name_from_id(test_id: int) -> str:
     '''uses a test id to get the name of a test'''
     query = '''
     select
@@ -20,7 +20,7 @@ def get_name_from_id(test_id):
             return rows[0][0]
     return None
 
-def list_tests(suite_id):
+def list_tests(suite_id: int) -> tuple:
     '''uses a suite id to list out all tests in that suite'''
     query = '''
     select
@@ -32,7 +32,7 @@ def list_tests(suite_id):
     '''
     return get_from_db(query, (suite_id, ))
 
-def get_most_recent_run_state(testid):
+def get_most_recent_run_state(testid: int) -> tuple:
     '''gets the state of the most recent run for a test'''
     query = '''
     select
@@ -47,7 +47,7 @@ def get_most_recent_run_state(testid):
     '''
     return get_from_db(query, (testid))
 
-def get_steps_for_test(testid):
+def get_steps_for_test(testid: int) -> list:
     '''returns all the steps in a test'''
     query = '''select
         action, optional, args, screenshot, screenshot_name, threshold
@@ -62,7 +62,7 @@ def get_steps_for_test(testid):
         stepnumber'''
     return [task(*i) for i in get_from_db(query, (testid))]
 
-def add_schedule(suite_id, test_id, active, period):
+def add_schedule(suite_id: int, test_id: int, active: bool, period: int) -> int:
     if not active:
         period = 0
     query = """insert into
@@ -71,7 +71,7 @@ def add_schedule(suite_id, test_id, active, period):
         (%s, %s, %s, %s, now() + interval %s minute)"""
     return write_to_db(query, (suite_id, test_id, active, period, period))
 
-def add_test(suite_id, name, active, period):
+def add_test(suite_id: int, name: str, active: bool, period: int) -> int:
     '''adds a test to the database'''
     query = """insert into
         tests(testname, suiteid)
@@ -81,7 +81,7 @@ def add_test(suite_id, name, active, period):
     add_schedule(suite_id, test_id, active, period)
     return test_id
 
-def delete_steps_from_test(testid):
+def delete_steps_from_test(testid: int) -> int:
     '''
     deletes all steps from a test
     (used when editing steps, because it's easier than updating each step)
@@ -93,7 +93,7 @@ def delete_steps_from_test(testid):
     '''
     write_to_db(query, (testid))
 
-def update_name(testid, name):
+def update_name(testid: int, name: str) -> str:
     '''changes the name of a test in the database'''
     query = '''update
         tests
@@ -103,7 +103,7 @@ def update_name(testid, name):
     '''
     write_to_db(query, (name, testid))
 
-def add_steps_to_test(testid, steps):
+def add_steps_to_test(testid: int, steps: tuple) -> None:
     '''adds steps to a test (deletes all of the previous steps first)'''
     delete_steps_from_test(testid)
     query = '''insert into
@@ -114,7 +114,7 @@ def add_steps_to_test(testid, steps):
                   for stepnumber, step in enumerate(steps, 1))
     write_many_to_db(query, steps)
 
-def copy_test(new_suite_id, old_test_id):
+def copy_test(new_suite_id: int, old_test_id: int) -> None:
     '''copies a test to a new suite (or the same suite)'''
     new_name = get_name_from_id(old_test_id)+'{}'
     name_list = {i[0] for i in list_tests(new_suite_id)}
@@ -131,7 +131,7 @@ def copy_test(new_suite_id, old_test_id):
     new_test_id = add_test(new_suite_id, new_name, False, 0)
     add_steps_to_test(new_test_id, get_steps_for_test(old_test_id))
 
-def get_full_test_info(suite_id):
+def get_full_test_info(suite_id: int) -> list:
     '''lists out all testsm and includes the most recent run state for each test'''
     test_base_info = list_tests(suite_id)
     tests = []
@@ -143,7 +143,7 @@ def get_full_test_info(suite_id):
             tests.append(test + (0, 0, 'never'))
     return tests
 
-def delete_test(test_id):
+def delete_test(test_id: int) -> int:
     '''recursively delete an entire test'''
     query = '''
     delete from
@@ -153,7 +153,7 @@ def delete_test(test_id):
     '''
     write_to_db(query, (test_id))
 
-def get_tests_scheduled_later_than_now():
+def get_tests_scheduled_later_than_now() -> tuple:
     '''
     gets tests that are scheduled to run later than now
     '''
@@ -167,7 +167,7 @@ def get_tests_scheduled_later_than_now():
     '''
     return get_from_db(query)
 
-def schedule_next_test(schedule_id):
+def schedule_next_test(schedule_id: int) -> tuple:
     '''
     schedules a test to run either at the last scheduled time + the period,
     or at now + the period\
@@ -186,7 +186,7 @@ def schedule_next_test(schedule_id):
     '''
     return write_to_db(query, (schedule_id))
 
-def get_schedule_config(suite_id, test_id):
+def get_schedule_config(suite_id: int, test_id: int) -> tuple:
     '''
     gets the configurable fields from a scheduled test
     '''
@@ -201,7 +201,7 @@ def get_schedule_config(suite_id, test_id):
     '''
     return get_from_db(query, (suite_id, test_id))
 
-def update_schedule_config(suite_id, test_id, active, period):
+def update_schedule_config(suite_id: int, test_id: int, active: bool, period: int) -> int:
     '''gets the configurable fields from a scheduled suite'''
     query = '''
     update

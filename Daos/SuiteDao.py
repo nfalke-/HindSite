@@ -4,7 +4,7 @@ Data Access module for suites
 from utils import get_from_db, write_to_db
 from Daos import TestDao
 
-def get_suite(suite_id):
+def get_suite(suite_id: int) -> tuple:
     '''return the suite name and description from the db using the suite id'''
     query = '''
     select
@@ -19,7 +19,7 @@ def get_suite(suite_id):
         return rows[0]
     return None
 
-def get_name_from_id(suite_id):
+def get_name_from_id(suite_id: int) -> str:
     '''get the name of the suite from the suite id'''
     query = '''
     select
@@ -35,7 +35,7 @@ def get_name_from_id(suite_id):
             return rows[0][0]
     return None
 
-def get_description_from_id(suite_id):
+def get_description_from_id(suite_id: int) -> str:
     '''get the description of the suite using the suite id'''
     query = '''
     select
@@ -51,7 +51,7 @@ def get_description_from_id(suite_id):
             return rows[0][0]
     return None
 
-def list_suites():
+def list_suites() -> tuple:
     '''list out all the suites in the database'''
     query = '''
     select
@@ -64,7 +64,7 @@ def list_suites():
     '''
     return get_from_db(query)
 
-def add_config(suite_id, browser, width, height):
+def add_config(suite_id: int, browser: str, width: int, height: int) -> int:
     '''add configuration to a suite'''
     query = """insert into
         suite_config (suiteid, browser, width, height)
@@ -72,7 +72,7 @@ def add_config(suite_id, browser, width, height):
         (%s, %s, %s, %s)"""
     return write_to_db(query, (suite_id, browser, width, height))
 
-def add_schedule(suite_id, active, period):
+def add_schedule(suite_id: int, active: bool, period: int) -> int:
     if not active:
         period = 0
     query = """insert into
@@ -81,7 +81,7 @@ def add_schedule(suite_id, active, period):
         (%s, %s, %s, now() + interval %s minute)"""
     return write_to_db(query, (suite_id, active, period, period))
 
-def add_suite(name, description, browser, width, height, active, period):
+def add_suite(name: str, description: str, browser: str, width: int, height: int, active: bool, period: int) -> int:
     '''add a suite to the database'''
     query = """insert into
         suites (suitename, description)
@@ -92,7 +92,7 @@ def add_suite(name, description, browser, width, height, active, period):
     add_schedule(suite_id, active, period)
     return suite_id
 
-def delete_suite(suite_id):
+def delete_suite(suite_id: int) -> None:
     '''delete a suite from the database'''
     query = """delete from
         suites
@@ -101,7 +101,7 @@ def delete_suite(suite_id):
     """
     write_to_db(query, (suite_id))
 
-def get_settings_for_suite(suiteid):
+def get_settings_for_suite(suiteid: int) -> tuple:
     '''get the configuration settings for a suite from the database'''
     query = '''
     select
@@ -116,7 +116,7 @@ def get_settings_for_suite(suiteid):
         return rows[0]
     return None
 
-def update_suite_settings(suite_id, browser, width, height):
+def update_suite_settings(suite_id: int, browser: str, width: int, height: int) -> None:
     '''update the configuration settings for a suite'''
     query = """
     update
@@ -130,7 +130,7 @@ def update_suite_settings(suite_id, browser, width, height):
     """
     write_to_db(query, (browser, width, height, suite_id))
 
-def update_suite(suite_id, name, description):
+def update_suite(suite_id: int, name: str, description: str) -> None:
     '''update a suite name and description'''
     query = """
     update
@@ -142,7 +142,7 @@ def update_suite(suite_id, name, description):
         suiteid = %s"""
     write_to_db(query, (name, description, suite_id))
 
-def copy_suite(old_suite_id):
+def copy_suite(old_suite_id: int) -> None:
     '''copy an entire suite recursively (all tests and steps get copied as well)'''
     new_name = get_name_from_id(old_suite_id)+'{}'
     name_list = {i[0] for i in list_suites()}
@@ -164,7 +164,7 @@ def copy_suite(old_suite_id):
     for test_id in tests:
         TestDao.copy_test(new_suite_id, test_id)
 
-def get_most_recent_run_state(suite_id):
+def get_most_recent_run_state(suite_id: int) -> tuple:
     '''get the most recent run from the most recently ran test'''
     query = '''
     select
@@ -185,7 +185,7 @@ def get_most_recent_run_state(suite_id):
     '''
     return get_from_db(query, (suite_id))
 
-def get_test_count(suite_id):
+def get_test_count(suite_id: int) -> tuple:
     '''count the tests in a suite'''
     query = '''
     select
@@ -200,7 +200,7 @@ def get_test_count(suite_id):
     '''
     return get_from_db(query, (suite_id))
 
-def get_suites_scheduled_later_than_now():
+def get_suites_scheduled_later_than_now() -> tuple:
     '''
     gets tests and suites that are scheduled to run later than now
     '''
@@ -215,7 +215,7 @@ def get_suites_scheduled_later_than_now():
     '''
     return get_from_db(query)
 
-def schedule_next_suite(schedule_id):
+def schedule_next_suite(schedule_id: int) -> int:
     '''
     schedules a test to run either at the last scheduled time + the period,
     or at now + the period
@@ -234,7 +234,7 @@ def schedule_next_suite(schedule_id):
     '''
     return write_to_db(query, (schedule_id))
 
-def get_schedule_config(suite_id):
+def get_schedule_config(suite_id: int) -> tuple:
     '''gets the configurable fields from a scheduled suite'''
     query = '''
     select
@@ -246,7 +246,7 @@ def get_schedule_config(suite_id):
     '''
     return get_from_db(query, (suite_id))[0] or (False, 0)
 
-def update_schedule_config(suite_id, active, period):
+def update_schedule_config(suite_id: int, active: bool, period: int) -> int:
     '''gets the configurable fields from a scheduled suite'''
     query = '''
     update
