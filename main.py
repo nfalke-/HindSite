@@ -12,7 +12,7 @@ import navigator
 from redis import Redis
 from rq import Queue
 
-q = Queue(connection=Redis())
+q = Queue(connection=Redis('localhost', 6379))
 
 app = Flask(__name__)
 
@@ -28,6 +28,7 @@ def json_safe(value):
     if isinstance(value, Decimal):
         return float(value)
     return value
+
 
 #view
 @app.route('/', methods=['GET', 'POST'])
