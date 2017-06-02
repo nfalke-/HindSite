@@ -4,6 +4,7 @@ Data Access module for suites
 from utils import get_from_db, write_to_db
 from Daos import TestDao
 
+
 def get_suite(suite_id: int) -> tuple:
     '''return the suite name and description from the db using the suite id'''
     query = '''
@@ -18,6 +19,7 @@ def get_suite(suite_id: int) -> tuple:
     if rows:
         return rows[0]
     return None
+
 
 def get_name_from_id(suite_id: int) -> str:
     '''get the name of the suite from the suite id'''
@@ -35,6 +37,7 @@ def get_name_from_id(suite_id: int) -> str:
             return rows[0][0]
     return None
 
+
 def get_description_from_id(suite_id: int) -> str:
     '''get the description of the suite using the suite id'''
     query = '''
@@ -51,6 +54,7 @@ def get_description_from_id(suite_id: int) -> str:
             return rows[0][0]
     return None
 
+
 def list_suites() -> tuple:
     '''list out all the suites in the database'''
     query = '''
@@ -64,6 +68,7 @@ def list_suites() -> tuple:
     '''
     return get_from_db(query)
 
+
 def add_config(suite_id: int, browser: str, width: int, height: int) -> int:
     '''add configuration to a suite'''
     query = """insert into
@@ -71,6 +76,7 @@ def add_config(suite_id: int, browser: str, width: int, height: int) -> int:
     values
         (%s, %s, %s, %s)"""
     return write_to_db(query, (suite_id, browser, width, height))
+
 
 def add_schedule(suite_id: int, active: bool, period: int) -> int:
     if not active:
@@ -81,7 +87,9 @@ def add_schedule(suite_id: int, active: bool, period: int) -> int:
         (%s, %s, %s, now() + interval %s minute)"""
     return write_to_db(query, (suite_id, active, period, period))
 
-def add_suite(name: str, description: str, browser: str, width: int, height: int, active: bool, period: int) -> int:
+
+def add_suite(name: str, description: str, browser: str, width: int,
+              height: int, active: bool, period: int) -> int:
     '''add a suite to the database'''
     query = """insert into
         suites (suitename, description)
@@ -92,6 +100,7 @@ def add_suite(name: str, description: str, browser: str, width: int, height: int
     add_schedule(suite_id, active, period)
     return suite_id
 
+
 def delete_suite(suite_id: int) -> None:
     '''delete a suite from the database'''
     query = """delete from
@@ -100,6 +109,7 @@ def delete_suite(suite_id: int) -> None:
         suiteid = %s
     """
     write_to_db(query, (suite_id))
+
 
 def get_settings_for_suite(suiteid: int) -> tuple:
     '''get the configuration settings for a suite from the database'''
@@ -116,6 +126,7 @@ def get_settings_for_suite(suiteid: int) -> tuple:
         return rows[0]
     return None
 
+
 def update_suite_settings(suite_id: int, browser: str, width: int, height: int) -> None:
     '''update the configuration settings for a suite'''
     query = """
@@ -130,6 +141,7 @@ def update_suite_settings(suite_id: int, browser: str, width: int, height: int) 
     """
     write_to_db(query, (browser, width, height, suite_id))
 
+
 def update_suite(suite_id: int, name: str, description: str) -> None:
     '''update a suite name and description'''
     query = """
@@ -141,6 +153,7 @@ def update_suite(suite_id: int, name: str, description: str) -> None:
     where
         suiteid = %s"""
     write_to_db(query, (name, description, suite_id))
+
 
 def copy_suite(old_suite_id: int) -> None:
     '''copy an entire suite recursively (all tests and steps get copied as well)'''
@@ -164,6 +177,7 @@ def copy_suite(old_suite_id: int) -> None:
     for test_id in tests:
         TestDao.copy_test(new_suite_id, test_id)
 
+
 def get_most_recent_run_state(suite_id: int) -> tuple:
     '''get the most recent run from the most recently ran test'''
     query = '''
@@ -185,6 +199,7 @@ def get_most_recent_run_state(suite_id: int) -> tuple:
     '''
     return get_from_db(query, (suite_id))
 
+
 def get_test_count(suite_id: int) -> tuple:
     '''count the tests in a suite'''
     query = '''
@@ -200,6 +215,7 @@ def get_test_count(suite_id: int) -> tuple:
     '''
     return get_from_db(query, (suite_id))
 
+
 def get_suites_scheduled_later_than_now() -> tuple:
     '''
     gets tests and suites that are scheduled to run later than now
@@ -214,6 +230,7 @@ def get_suites_scheduled_later_than_now() -> tuple:
         and active
     '''
     return get_from_db(query)
+
 
 def schedule_next_suite(schedule_id: int) -> int:
     '''
@@ -234,6 +251,7 @@ def schedule_next_suite(schedule_id: int) -> int:
     '''
     return write_to_db(query, (schedule_id))
 
+
 def get_schedule_config(suite_id: int) -> tuple:
     '''gets the configurable fields from a scheduled suite'''
     query = '''
@@ -246,7 +264,8 @@ def get_schedule_config(suite_id: int) -> tuple:
     '''
     return get_from_db(query, (suite_id))[0] or (False, 0)
 
-def update_schedule_config(suite_id: int, active: bool, period: int) -> int:
+
+def update_schedule_config(suite_id: int, active: bool, period: int) -> tuple:
     '''gets the configurable fields from a scheduled suite'''
     query = '''
     update
@@ -256,4 +275,4 @@ def update_schedule_config(suite_id: int, active: bool, period: int) -> int:
     where
         suiteid = %s
     '''
-    return write_to_db(query, (active, period, suite_id)) or (False, 0)
+    return (True, write_to_db(query, (active, period, suite_id))) or (False, 0)

@@ -14,6 +14,7 @@ from config import config
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
+
 def run_test(test_id: int, size: tuple, browser: str):
     '''run a test'''
     navigator = Navigator(test_id, (size), browser=browser)
@@ -28,6 +29,7 @@ BROWSERS = {
     'edge': webdriver.edge,
     'opera': webdriver.Opera
 }
+
 
 class Navigator(object):
     '''
@@ -72,6 +74,7 @@ class Navigator(object):
 
     def _highlight(self, style, element):
         driver = element._parent
+
         def apply_style(style):
             '''
                 applies a style to an element
@@ -96,6 +99,7 @@ class Navigator(object):
 
     def _diff_screenshots(self, image_a, image_b, opacity=0.85):
         point_table = ([0] + ([255] * 255))
+
         def new_gray(size, color):
             '''
             returns a darkened mask to highlight differences
@@ -122,8 +126,10 @@ class Navigator(object):
         return new
 
     def _take_fullpage_screenshot(self):
-        total_width = self.browser.execute_script("return (document.width !== undefined) ? document.width : document.body.offsetWidth")
-        total_height = self.browser.execute_script("return (document.height !== undefined) ? document.height : document.body.offsetHeight")
+        total_width = self.browser.execute_script(
+            "return (document.width !== undefined) ? document.width : document.body.offsetWidth")
+        total_height = self.browser.execute_script(
+            "return (document.height !== undefined) ? document.height : document.body.offsetHeight")
         partial_screenshot = self._take_partial_screenshot()
         client_width, client_height = partial_screenshot.size
         total_width = max(total_width, client_width)

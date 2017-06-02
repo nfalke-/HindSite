@@ -16,10 +16,11 @@ task = namedtuple('task', [
     ])
 
 
-def makedir(dirname: str) -> str:
+def makedir(dirname: str) -> None:
     '''creates a directory if one doesn't already exist'''
     if not os.path.isdir(dirname):
         os.makedirs(dirname)
+
 
 def get_from_db(query: str, args=()) -> tuple:
     '''
@@ -35,6 +36,7 @@ def get_from_db(query: str, args=()) -> tuple:
         return results
     return ()
 
+
 def write_to_db(query: str, args=()) -> int:
     '''
     writes a row to the db using an INSERT or UPDATE query
@@ -48,7 +50,8 @@ def write_to_db(query: str, args=()) -> int:
     database.commit()
     return cursor.lastrowid
 
-def write_many_to_db(query: int, args=()) -> int:
+
+def write_many_to_db(query: str, args=()) -> int:
     '''
     writes rows to the db using an INSERT or UPDATE query
     returns the last row affected
