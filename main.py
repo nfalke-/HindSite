@@ -36,19 +36,13 @@ def json_safe(value: object) -> object:
 @app.route('/', methods=['GET'])
 def index() -> str:
     '''for list of suites'''
-    suites = SuiteDao.list_suites()
-    return render_template('view/root.html', suites=suites)
+    return render_template('view/root.html')
 
 
 @app.route('/suites/<suite_id>/', methods=['GET'])
 def view_suite(suite_id: int) -> str:
     '''for list of tests'''
-    suites = SuiteDao.list_suites()
-    tests = TestDao.get_full_test_info(suite_id)
-    return render_template(
-        'view/suite.html', tests=tests,
-        suites=suites, suite_id=suite_id
-    )
+    return render_template('view/suite.html', suite_id=suite_id)
 
 
 @app.route('/suites/<suite_id>/tests/<test_id>/', methods=['GET'])
@@ -76,10 +70,11 @@ def index_api() -> flask.wrappers.Response:
     for suite in SuiteDao.list_suites():
         suites += [
             suite +
-            (SuiteDao.get_most_recent_run_state(suite[1]) or ('never', )) +
-            (SuiteDao.get_test_count(suite[1]) or (0, ))
+            (SuiteDao.get_most_recent_run_state(suite[1]) or (('never', ), ))[0] +
+            (SuiteDao.get_test_count(suite[1]) or ((0, ), ))[0]
         ]
-    return jsonify(suites)
+    headers = ['name', 'id', 'description', 'browser', 'width', 'height', 'last_ran', 'test_count']
+    return jsonify([dict(zip(headers, i)) for i in suites])
 
 
 @app.route('/suites/<suite_id>/data/', methods=['GET'])
@@ -87,7 +82,17 @@ def suite_api(suite_id: int) -> flask.wrappers.Response:
     '''gives information for tests view in json format'''
     tests = TestDao.get_full_test_info(suite_id)
     tests = [[json_safe(i) for i in j] for j in tests]
-    return jsonify(tests)
+    headers = ['name', 'id', 'passed', 'screenshot_passed', 'last_ran']
+    return jsonify([dict(zip(headers, i)) for i in tests])
+
+
+@app.route('/suites/<suite_id>/copy/data/', methods=['GET'])
+def suite_copy_api(suite_id: int) -> flask.wrappers.Response:
+    data = {
+        "suites": [{"name": i[0], "id": i[1]} for i in SuiteDao.list_suites()],
+        "tests": [{"name": i[0], "id": i[1]} for i in TestDao.get_full_test_info(suite_id)]
+    }
+    return jsonify(data)
 
 
 @app.route('/suites/<suite_id>/tests/<test_id>/data/', methods=['GET'])
@@ -95,11 +100,13 @@ def test_api(suite_id: int, test_id: int) -> flask.wrappers.Response:
     '''gives information for runs and step view in json format'''
     steps = TestDao.get_steps_for_test(test_id)
     runs = RunDao.get_runs(test_id)
+    step_headers = ["action", "optional", "arguments", "screenshot", "screenshot_name", "threshold"]
+    run_headers = ["id", "start", "end", "passed", "screenshot_passed"]
     data = {
         "suite": suite_id,
         "test": test_id,
-        "steps": [[json_safe(i) for i in j] for j in steps],
-        "runs": [[json_safe(i) for i in j] for j in runs]
+        "steps": [dict(zip(step_headers, [json_safe(i) for i in j])) for j in steps],
+        "runs": [dict(zip(run_headers, [json_safe(i) for i in j])) for j in runs]
     }
     return jsonify(data)
 
@@ -107,9 +114,15 @@ def test_api(suite_id: int, test_id: int) -> flask.wrappers.Response:
 @app.route('/suites/<suite_id>/tests/<test_id>/runs/<run_id>/data/', methods=['GET'])
 def run_api(suite_id: int, test_id: int, run_id: int) -> flask.wrappers.Response:
     '''gives information for single-run view in json format'''
-    steps = RunDao.get_steps_for_run(run_id)
-    steps = tuple([json_safe(i) for i in j] for j in steps)
-    return jsonify(steps)
+    step_headers = [
+        "action", "optional", "arguments", "passed", "screenshot", "screenshot_percentage",
+        "screenshot_passed", "screenshot_name"
+    ]
+    steps = tuple([json_safe(i) for i in j] for j in RunDao.get_steps_for_run(run_id))
+    data = {
+        "steps": [dict(zip(step_headers, i)) for i in steps]
+    }
+    return jsonify(data)
 
 
 # add forms
@@ -265,7 +278,7 @@ def run_suite(suite_id: int):
 @app.route('/suites/copy/', methods=['POST'])
 def copy_suite():
     '''copy an entire suite'''
-    suite = request.form.get('suite')
+    suite = int(request.form.get('suite'))
     SuiteDao.copy_suite(suite)
     return redirect(url_for('index'))
 

@@ -157,7 +157,7 @@ class Navigator(object):
         return Image.open(io.BytesIO(self.browser.get_screenshot_as_png()))
 
     def _import(self, test_id):
-        self.task_list = TestDao.get_steps_for_test(test_id) + self.task_list
+        self.task_list = list(TestDao.get_steps_for_test(test_id)) + self.task_list
 
     def _refresh(self, _):
         self.video.resume()
@@ -257,6 +257,7 @@ class Navigator(object):
         '''
         runs the test
         '''
+        self.task_list = list(self.task_list)
         while self.task_list:
             self._do_task(self.task_list.pop(0))
         self.video.resume()

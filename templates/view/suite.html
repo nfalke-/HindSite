@@ -1,35 +1,53 @@
 <head>
-    <script src="/static/common.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>`
     <script>
-        var http = new XMLHttpRequest();
-        http.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var table_json = JSON.parse(this.responseText);
-                retVal = []
-                for (var i = 0; i < table_json.length; i++) {
-                    row = table_json[i]
-                    var test_name = build_link("/suites/{{suite_id}}/tests/" + row[1], row[0]);
-                    var test_passed = build_span(row[2]);
-                    if (row[2] === '') {
-                        test_passed = build_span("pending...");
+        function make_test_row(row){
+            $row = $('<tr/>');
+            $row.append($('<td/>').html($('<a/>').attr('href', '/suites/{{suite_id}}/tests/'+row.id).text(row.name)))
+            $row.append($('<td/>').text(row.passed))
+            $row.append($('<td/>').text(row.screenshot_passed))
+            $row.append($('<td/>').text(row.last_ran))
+            $row.append($('<td/>').append(
+                $('<button/>').text('x').click(
+                    function() {
+                        $.get('/suites/{{suite_id}}/tests/'+row.id+'/delete/')
+                        update()
                     }
-                    var screenshot_passed = build_span(row[3]);
-                    if (row[3] === '') {
-                        screenshot_passed = build_span("pending...");
-                    }
-                    var last_ran = build_span(row[4]);
-                    var delete_button = build_button("x", 
-                        "sendRequest('/suites/{{suite_id}}/tests/" + row[1] + "/delete/')"
-                        )
-                    modified = [test_name, test_passed, screenshot_passed, last_ran, delete_button]
-                    retVal.push(modified)
-                }
-                updateTable('tests', retVal);
-            }
-        };
+                )
+            ))
+            return $row
+        }
 
-        var url = "/suites/{{suite_id}}/data/";
-        update(url);
+        function make_table(data, id, make_row) {
+            $table = $('<tbody>').attr("id", id)
+            data.forEach(function(row) {
+                $table.append(make_row(row))
+            })
+            return $table
+        }
+
+        function make_select(data, select_id, select_name, default_option) {
+            $select = $('<select/>').attr('id', select_id).attr('name', select_name)
+            $select.append($('<option\>').attr('value', 0).text(default_option))
+            data.forEach(function(row) {
+                $select.append($('<option\>').attr('value', row.id).text(row.name))
+            })
+            return $select
+        }
+
+        function update() {
+            $.get("/suites/{{suite_id}}/data/", function(data) {
+                $('#tests').replaceWith(make_table(data, "tests", make_test_row));
+            })
+            $.get("/suites/{{suite_id}}/copy/data/", function(data) {
+                console.log(data)
+                $('#test_to_copy').replaceWith(make_select(data.tests, "test_to_copy", "test", "Test Name"));
+                $('#suite_to_copy_to').replaceWith(make_select(data.suites, "suite_to_copy_to", "suite", "Suite Name"));
+            })
+            setTimeout(update, 30000)
+        }
+
+        update()
     </script>
 </head>
 
@@ -38,9 +56,9 @@
         <a href='/suites/{{suite_id}}/tests/add'>New Test</a><br>
         <a href='/suites/{{suite_id}}/edit'>Edit Suite</a><br>
         {% if tests %}
-            <input type="button", value='run suite' onclick="sendRequest(
-                '/suites/{{suite_id}}/run/'
-            )"><br>
+            <input type="button" value='run suite'
+             onclick="$.get('/suites/{{suite_id}}/run/')">
+            <br>
         {% endif %}
         <table border="1">
             <thead>
@@ -57,13 +75,10 @@
 
         <h3>Copy Test</h3>
         <form method=post enctype=multipart/form-data action=/suites/{{suite_id}}/tests/copy/>
-            <select name="test">
+            <select name="test" id="test_to_copy">
                 <option value=0>Test Name</option>
-                {% for test_name, test_id, passed, screenshot_passed, last_ran in tests %}
-                    <option value="{{test_id}}">{{test_name}}</option>
-                {% endfor %}
             </select>
-            <select name="suite">
+            <select name="suite" id="suite_to_copy_to">
                 <option value=0>Suite Name</option>
                 {% for suite_name, suite_id, description, browser, width, height in suites %}
                     <option value="{{suite_id}}">{{suite_name}}</option>

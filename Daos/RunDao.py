@@ -25,7 +25,7 @@ def get_steps_for_run(runid: int) -> tuple:
     '''
     query = '''
     select
-        action, args, passed, take_screenshot,
+        action, optional, args, passed, take_screenshot,
         screenshot_percentage, screenshot_passed, screenshot_name
     from
         run_step

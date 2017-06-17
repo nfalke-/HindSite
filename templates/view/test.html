@@ -1,26 +1,43 @@
 <head>
-    <script src="/static/common.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>`
     <script>
-        var http = new XMLHttpRequest();
-        http.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var table_json = JSON.parse(this.responseText);
-                retVal = []
-                for (var i = 0; i < table_json.runs.length; i++) {
-                    row = table_json.runs[i]
-                    var run_link = build_link("/suites/{{suite_id}}/tests/{{test_id}}/runs/" + row[0], row[0]);
-                    var start_time = build_span(row[1]);
-                    var end_time = build_span(row[2]);
-                    var passed = build_span(row[3]);
-                    var screenshot_passed = build_span(row[4]);
-                    modified = [run_link, start_time, end_time, passed, screenshot_passed]
-                    retVal.push(modified)
-                }
-                updateTable('runs', retVal);
-            }
-        };
-        var url = "/suites/{{suite_id}}/tests/{{test_id}}/data/";
-        update(url);
+        function make_step_row(row){
+            $row = $('<tr/>');
+            $row.append($('<td/>').text(row.action))
+            $row.append($('<td/>').text(row.arguments))
+            $row.append($('<td/>').text(row.screenshot))
+            $row.append($('<td/>').text(row.threshold))
+            return $row
+        }
+
+        function make_run_row(row){
+            $row = $('<tr/>');
+            $row.append($('<td/>').html($('<a/>')
+                .attr('href', '/suites/{{suite_id}}/tests/{{test_id}}/runs/'+row.id)
+                .text(row.start)))
+            $row.append($('<td/>').text(row.end))
+            $row.append($('<td/>').text(row.passed))
+            $row.append($('<td/>').text(row.screenshot_passed))
+            return $row
+        }
+
+        function make_table(data, id, make_row) {
+            $table = $('<tbody>').attr("id", id)
+            data.forEach(function(row) {
+                $table.append(make_row(row))
+            })
+            return $table
+        }
+
+        function update() {
+            $.get("/suites/{{suite_id}}/tests/{{test_id}}/data/", function(data) {
+                $('#steps').replaceWith(make_table(data.steps, "steps", make_step_row));
+                $('#runs').replaceWith(make_table(data.runs, "runs", make_run_row));
+            })
+            setTimeout(update, 30000)
+        }
+        update()
+
     </script>
 </head>
 
@@ -28,9 +45,9 @@
     <center>
         <table border="1">
             {% if steps %}
-                <input type="button" value='run test' onclick="sendRequest(
-                    '/suites/{{suite_id}}/tests/{{test_id}}/run/'
-                )"><br>
+                <input type="button" value='run test'
+                 onclick="$.get('/suites/{{suite_id}}/tests/{{test_id}}/run/'); update()">
+                <br>
             {% endif %}
             <a href="/suites/{{suite_id}}/tests/{{test_id}}/edit/">edit test</a>
 
@@ -42,23 +59,13 @@
                     <td>Diff Threshold</td>
                 </tr>
             </thead>
-            <tbody>
-                {% for action, optional, args, screenshot, screenshot_name, threshold in steps %}
-                    <tr>
-                        <td>{{ action }}</td>
-                        <td>{{ args }}</td>
-                        <td>{{ screenshot }}</td>
-                        <td>{{ threshold }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            <tbody id="steps"> </tbody>
         </table>
 
         <H3>Previous Runs</H3>
         <table border="1">
             <thead>
                 <tr>
-                    <td>run_id</td>
                     <td>start</td>
                     <td>end</td>
                     <td>passed</td>

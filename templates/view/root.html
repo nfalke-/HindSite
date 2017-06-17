@@ -1,32 +1,52 @@
 <head>
-    <script src="/static/common.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>`
     <script>
-        var http = new XMLHttpRequest();
-        http.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var table_json = JSON.parse(this.responseText);
-                retVal = []
-                for (var i = 0; i < table_json.length; i++) {
-                    row = table_json[i]
-                    var suite_name = build_link("/suites/" + row[1], row[0]);
-                    var browser = build_span(row[3]);
-                    var description = build_span(row[2]);
-                    var blank = build_span('');
-                    var delete_button = build_button("x", 
-                        "sendRequest('/suites/" + row[1] + "/delete/')"
-                    );
-                    var dims = build_span(row[4]+'x'+row[5]);
-                    var lastran = build_span(row[6]);
-                    var test_count = build_span(row[7]);
-                    modified = [suite_name, browser, dims, lastran, description, test_count, blank, delete_button]
-                    retVal.push(modified)
-                }
-                updateTable('suites', retVal);
-            }
-        };
+        function make_row(row){
+            $row = $('<tr/>');
+            $row.append($('<td/>').html($('<a/>').attr('href', '/suites/'+row.id).text(row.name)))
+            $row.append($('<td/>').text(row.browser))
+            $row.append($('<td/>').text(row.width+'x'+row.height))
+            $row.append($('<td/>').text(row.last_ran))
+            $row.append($('<td/>').text(row.description))
+            $row.append($('<td/>').text(row.test_count))
+            $row.append($('<td/>').text(0))
+            $row.append($('<td/>').append(
+                $('<button/>').text('x').click(
+                    function() {
+                        $.get('/suites/'+row.id+'/delete/')
+                        update()
+                    }
+                )
+            ))
+            return $row
+        }
 
-        var url = "/data/";
-        update(url);
+        function make_table(data) {
+            $table = $('<tbody>').attr("id", "suites")
+            data.forEach(function(row) {
+                $table.append(make_row(row))
+            })
+            return $table
+        }
+
+        function make_select(data) {
+            $select = $('<select/>').attr('id', 'suite_select').attr('name', 'suite')
+            $select.append($('<option\>').attr('value', 0).text("Suite Name"))
+            data.forEach(function(row) {
+                $select.append($('<option\>').attr('value', row.id).text(row.name))
+            })
+            return $select
+        }
+
+        function update() {
+            $.get("/data/", function(data) {
+                $('#suites').replaceWith(make_table(data));
+                $('#suite_select').replaceWith(make_select(data));
+            })
+            setTimeout(update, 30000)
+        }
+
+        update()
     </script>
 </head>
 
@@ -51,12 +71,7 @@
 
         <h3>Copy Suite</h3>
         <form method=post enctype=multipart/form-data action=/suites/copy/>
-            <select name="suite">
-                <option value=0>Suite Name</option>
-                {% for suite_name, suite_id, description, browser, width, height in suites %}
-                    <option value="{{suite_id}}">{{suite_name}}</option>
-                {% endfor %}
-            </select>
+            <select id="suite_select" name="suite"> </select>
             <input type=submit value=Copy>
         </form>
     </center>

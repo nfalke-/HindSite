@@ -1,46 +1,89 @@
 <head>
     <link rel="stylesheet" type="text/css" href="/static/run.css">
-    <script src="/static/common.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>`
     <script>
-
-        var http = new XMLHttpRequest();
-        http.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var table_json = JSON.parse(this.responseText);
-                retVal = []
-                for (var i = 0; i < table_json.length; i++) {
-                    row = table_json[i]
-                    var action = build_span(row[0]);
-                    var args = build_span(row[1]);
-                    var screenshot = build_span('');
-                    var diff_screenshot = build_span('');
-                    if (row[6]) {
-                        screenshot = document.createElement("div");
-                        var screenshot_image = build_image({{test_id}}, {{run_id}}, row[6]);
-                        var accept_button = build_button("Accept as Baseline",
-                        "sendRequest('/suites/{{suite_id}}" + "/tests/{{test_id}}" + 
-                        "/runs/{{run_id}}" + "/baseline/" + row[6] + "')"
-                        );
-                        screenshot.append(screenshot_image);
-                        screenshot.append(accept_button);
-                        
-                        diff_screenshot = build_span('No baseline Available');
-                        if (row[4] >= 0) {
-                            diff_screenshot = document.createElement("div");
-                            diff_screenshot_image = build_image({{test_id}}, {{run_id}}, "diff_"+row[6])
-                            diff_screenshot.append(diff_screenshot_image);
-                            diff_screenshot.append(build_span("Difference: "+ row[4]*100 + '%'));
-                        }
-                    }
-                    var screenshot_passed = build_span(row[5])
-                    modified = [action, args, screenshot, diff_screenshot, screenshot_passed]
-                    retVal.push(modified)
+        PATH='/static/files/{{test_id}}/{{run_id}}/'
+        function make_step_row(row){
+            $row = $('<tr/>');
+            $row.append($('<td/>').text(row.action))
+            $row.append($('<td/>').text(row.arguments))
+            $screenshot = $('<td/>')
+            $diff = $('<td/>')
+            if (row.screenshot_name) {
+                $screenshot = $screenshot
+                    .html(
+                        $('<div/>')
+                        .attr('class', 'screenshot-container')
+                        .html(
+                            $('<img/>')
+                            .attr('src',PATH+row.screenshot_name+'.png')
+                            .attr('class', 'screenshot')
+                            .click(function(){
+                                modal.style.display = "block";
+                                modalImg.src = this.src;
+                            })
+                        )
+                    ).append(
+                        $('<input/>')
+                            .attr('type', 'button')
+                            .attr('value', 'Accept as baseline')
+                            .click(function(){
+                                $.get(
+                                    '/suites/{{suite_id}}' + 
+                                    '/tests/{{test_id}}' +
+                                    '/runs/{{run_id}}/baseline/'+row.screenshot_name
+                                )
+                            })
+                    )
+                if (row.screenshot_percentage >= 0){
+                    $diff = $diff.html(
+                        $('<div/>')
+                        .attr('class', 'screenshot-container')
+                        .html(
+                            $('<img/>')
+                            .attr('src',PATH+'diff_'+row.screenshot_name+'.png')
+                            .attr('class', 'screenshot')
+                            .click(function(){
+                                modal.style.display = "block";
+                                modalImg.src = this.src;
+                            })
+                        )
+                    )
+                } else {
+                    $diff = $diff.html($('<span/>').text('no baseline available'))
                 }
-                updateTable('steps', retVal);
             }
-        };
-        var url = "/suites/{{suite_id}}/tests/{{test_id}}/runs/{{run_id}}/data/";
-        update(url);
+            $row.append($screenshot)
+            $row.append($diff)
+            return $row
+        }
+
+        function make_run_row(row){
+            $row = $('<tr/>');
+            $row.append($('<td/>').html($('<a/>')
+                .attr('href', '/suites/{{suite_id}}/tests/{{test_id}}/runs/'+row.id)
+                .text(row.start)))
+            $row.append($('<td/>').text(row.end))
+            $row.append($('<td/>').text(row.passed))
+            $row.append($('<td/>').text(row.screenshot_passed))
+            return $row
+        }
+
+        function make_table(data, id, make_row) {
+            $table = $('<tbody>').attr("id", id)
+            data.forEach(function(row) {
+                $table.append(make_row(row))
+            })
+            return $table
+        }
+
+        function update() {
+            $.get("/suites/{{suite_id}}/tests/{{test_id}}/runs/{{run_id}}/data/", function(data) {
+                $('#steps').replaceWith(make_table(data.steps, "steps", make_step_row));
+            })
+            setTimeout(update, 30000)
+        }
+        update()
     </script>
 </head>
 
@@ -56,7 +99,6 @@
                     <td>Arguments</td>
                     <td>Screenshot</td>
                     <td>Screenshot Diff</td>
-                    <td>Screenshot Passed</td>
                 </tr>
             </thead>
             <tbody id="steps"></tbody>
