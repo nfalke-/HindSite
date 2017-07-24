@@ -129,16 +129,21 @@ class Navigator(object):
         total_width = self.browser.execute_script(
             "return (document.width !== undefined) ? document.width : document.body.offsetWidth")
         total_height = self.browser.execute_script(
-            "return (document.height !== undefined) ? document.height : document.body.offsetHeight")
+            """return Math.max(document.body.scrollHeight, document.body.offsetHeight,
+                               document.documentElement.clientHeight, document.documentElement.scrollHeight,
+                               document.documentElement.offsetHeight );""")
+	
         partial_screenshot = self._take_partial_screenshot()
         client_width, client_height = partial_screenshot.size
         total_width = max(total_width, client_width)
         total_height = max(total_height, client_height)
         full_screenshot = Image.new('RGBA', (total_width, total_height))
         full_screenshot.paste(partial_screenshot, (0, 0))
+        self.browser.execute_script("a = document.getElementsByTagName('header')[0]; a ? a.setAttribute('style', 'position: absolute; top: 0px;') : null;")
 
         x, y = 0, 0
         while y < total_height:
+            print(y)
             y += client_height
             y_offset = y
             if y + client_height > total_height:
