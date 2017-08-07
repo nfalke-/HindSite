@@ -1,0 +1,83 @@
+/*wooo main CSS*/
+/*#0d1b11 = dgreen, #226034 = lgreen, #cfd8d0 = lgrey, #aaaaaa = dgrey */
+body {
+	background-color: #cfd8d0;
+	font-family: arial, sans-serif;
+}
+
+a {
+	text-decoration: none;
+}
+
+#main {
+	text-align: center;
+	clear: both;
+	position: relative;
+	top: 80px;
+}
+
+#header {
+	background-color: #0d1b11;
+	width: 100%;
+	height: 50px;
+	position: fixed;
+	top: 0;
+	left: 0;
+	color: #cfd8d0;
+	font-weight: bold;
+}
+
+#logo {
+	width: 80px;
+}
+
+#name {
+	position: absolute;
+	padding: 0;
+	font-size: 25px;
+	top: -15px;
+	left: 0;
+	padding-left: 10px;
+}
+
+#name a:visited, #name a {
+	color: #9dc0a7;
+}
+
+#name a:hover {
+	color: #226034;
+}
+
+#nav1 {
+	position: absolute;
+	list-style-type: none;
+	padding: 0;
+	font-size: 25px;
+	top: -15px;
+	right: 0;
+}
+#nav1 li {
+	display: inline;
+	padding-right: 10px;
+}
+
+#nav1 a, #nav1 a:visited {
+	color: #cfd8d0
+}
+
+#nav1 a:hover {
+	color: #aaaaaa
+}
+
+#suiteinfo {
+	display: inline-block;
+}
+
+#suiteinfo {
+	background-color: #aaaaaa;
+}
+
+.noshow {
+	background-color: #cfd8d0;
+}
+
