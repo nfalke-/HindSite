@@ -81,3 +81,10 @@ a {
 	background-color: #cfd8d0;
 }
 
+.suite {
+    background-color: lightgrey;
+    width: 300px;
+    border: 25px solid green;
+    padding: 25px;
+    margin: 25px;
+}
