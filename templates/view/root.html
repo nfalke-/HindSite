@@ -9,29 +9,28 @@
                     $.get('/suites/'+row.id+'/delete/')
                     update()
                 }
-            )
-            $name = $('<a/>').attr('href', '/suites/'+row.id).text(row.name)
-            $browser = $('<div/>').text(row.browser) 
-            $dims = $('<div/>').text(row.width+'x'+row.height)
-            $lastRan = $('<div/>').text("Last Ran: " + row.last_ran)
+            ).attr("class", "deleteb")
+            $name = $('<a/>').attr('href', '/suites/'+row.id).text(row.name).attr("class", "suitename")
+			$lastRan = $('<div/>').text("Last Ran: " + row.last_ran).attr("id", "lastran")
+            $browser = $('<div/>').text(row.browser).attr("class", "linline")
+            $dims = $('<div/>').text(row.width+'x'+row.height).attr("class", "rinline")
             $description = $('<div/>').text("Description: " + row.description)
-            $testCount = $('<div/>').text('Test Count: ' + row.test_count)
-            //set class and id and stuff like this
-            $failCount = $('<div/>').text('Fail Count: ' + 0)//.attr('class', 'yourclassnamehere')
+            $testCount = $('<div/>').text('Test Count: ' + row.test_count).attr("class", "linline")
+            $failCount = $('<div/>').text('Fail Count: ' + 0).attr("class", "rinline")
 
             //move these around to put things where you like them
             $row = $('<div/>').attr('class', 'suite'); 
             $top = $('<div/>').html($name)
             $top.append($button)
             $row.append($top)
+			$row.append($lastRan)
             $settings = $('<div/>')
             $settings.append($browser)
             $settings.append($dims)
             $row.append($settings)
-            $row.append($lastRan)
-            $row.append($description)
-            $row.append($testCount)
+			$row.append($testCount)
             $row.append($failCount)
+            $row.append($description)
 
             return $row
         }
@@ -67,20 +66,20 @@
 
 <body>
 	<div id="header">
-		<p id="name"><a href="Desktop/HindSite/templates/view/root.html">HindSite</a></p>
+		<p id="name"><a href="/">H i n d S i t e</a></p>
 		<ul id="nav1">
-			<li><a href="Desktop/HindSite/templates/view/root.html">Suites</a></li>
+			<li><a href="/">Suites</a></li>
 			<li ><a href="placeholder/IHaventMadeThisPage.html">About</a></li>
 		</ul>
 		<center><img src="static/images/logobase.png" id="logo" /></center>
 	</div>
     <div id="main">
-        <a href='/suites/add'>New Suite</a><p>
+        <a href='/suites/add' id="newsuite">New Suite</a><p>
             <center>
                 <div id="suites">
                 </div>
             </center>
-        <h3>Copy Suite</h3>
+        <p id="copys">Copy Suite</p>
         <form method=post enctype=multipart/form-data action=/suites/copy/>
             <select id="suite_select" name="suite"> </select>
             <input type=submit value=Copy>

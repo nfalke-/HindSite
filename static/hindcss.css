@@ -1,8 +1,9 @@
 /*wooo main CSS*/
-/*#0d1b11 = dgreen, #226034 = lgreen, #cfd8d0 = lgrey, #aaaaaa = dgrey */
+/*#0d1b11 = dgreen, #226034 = lgreen, #cfd8d0 = lgrey, #aaaaaa = dgrey #bec2be = newgrey*/
+/*things to fix: delete button in top corner, please capitalize browser names, button image, inline spacing*/
 body {
 	background-color: #cfd8d0;
-	font-family: arial, sans-serif;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
 a {
@@ -14,6 +15,7 @@ a {
 	clear: both;
 	position: relative;
 	top: 80px;
+	min-width: 500px;
 }
 
 #header {
@@ -25,6 +27,7 @@ a {
 	left: 0;
 	color: #cfd8d0;
 	font-weight: bold;
+	min-width: 500px;
 }
 
 #logo {
@@ -55,6 +58,7 @@ a {
 	font-size: 25px;
 	top: -15px;
 	right: 0;
+	
 }
 #nav1 li {
 	display: inline;
@@ -66,7 +70,7 @@ a {
 }
 
 #nav1 a:hover {
-	color: #aaaaaa
+	color: #bec2be;
 }
 
 #suiteinfo {
@@ -77,14 +81,56 @@ a {
 	background-color: #aaaaaa;
 }
 
-.noshow {
-	background-color: #cfd8d0;
-}
-
 .suite {
-    background-color: lightgrey;
+    text-align: center;
+	background-color: #bec2be;
     width: 300px;
-    border: 25px solid green;
     padding: 25px;
     margin: 25px;
+	border-radius: 5px;
+}
+
+.linline {
+	display: inline-block;
+	padding-right: 15px;
+}
+.rinline {
+	display: inline-block;
+	padding-left: 15px;
+}
+
+.deleteb {
+	float: right;
+	/*background-image: url(Images/X.png);*/
+}
+
+.suitename, .suitename:visited {
+	font-size: 20px;
+	padding-bottom: 50px;
+	color: #226034;
+	text-align: center;
+	float: clear;
+}
+.suitename:hover {
+	color: #0d1b11;
+}
+
+#newsuite, #newsuite:visited {
+	color: #226034;
+	font-weight: bold;
+	font-size: 20px;
+}
+#newsuite:hover {
+	color: #0d1b11;
+}
+
+#lastran {
+	font-size: 13px;
+	padding-bottom: 10px;
+}
+
+#copys {
+	color: #226034;
+	font-weight: bold;
+	font-size: 20px;
 }
