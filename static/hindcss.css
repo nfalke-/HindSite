@@ -1,9 +1,10 @@
 /*wooo main CSS*/
 /*#0d1b11 = dgreen, #226034 = lgreen, #cfd8d0 = lgrey, #aaaaaa = dgrey #bec2be = newgrey*/
-/*things to fix: delete button in top corner, please capitalize browser names, button image, inline spacing*/
+/*things to fix: delete button in top corner, please capitalize browser names, button image, inline spacing, possibly lighten colors*/
 body {
 	background-color: #cfd8d0;
 	font-family: "Trebuchet MS", Helvetica, sans-serif;
+	padding-bottom: 30px;
 }
 
 a {
@@ -16,6 +17,7 @@ a {
 	position: relative;
 	top: 80px;
 	min-width: 500px;
+	padding-bottom: 20px;
 }
 
 #header {
@@ -28,6 +30,24 @@ a {
 	color: #cfd8d0;
 	font-weight: bold;
 	min-width: 500px;
+	z-index: 200;
+}
+
+footer {
+	background-color: #0d1b11;
+	height: 12px;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	min-width: 500px;
+	padding-bottom: 18px;
+}
+
+#copyright {
+	text-align: center;
+	color: #cfd8d0;
+	font-size: 12px;
 }
 
 #logo {
