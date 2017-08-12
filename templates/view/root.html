@@ -12,9 +12,9 @@
             ).attr("class", "deleteb")
             $name = $('<a/>').attr('href', '/suites/'+row.id).text(row.name).attr("class", "suitename")
 			$lastRan = $('<div/>').text("Last Ran: " + row.last_ran).attr("id", "lastran")
-            $browser = $('<div/>').text(row.browser).attr("class", "linline")
+            $browser = $('<div/>').text(row.browser).attr("class", "linline").attr("id", "capbrow")
             $dims = $('<div/>').text(row.width+'x'+row.height).attr("class", "rinline")
-            $description = $('<div/>').text("Description: " + row.description)
+            $description = $('<div/>').text("Description: " + row.description).attr("id", "des")
             $testCount = $('<div/>').text('Test Count: ' + row.test_count).attr("class", "linline")
             $failCount = $('<div/>').text('Fail Count: ' + 0).attr("class", "rinline")
 

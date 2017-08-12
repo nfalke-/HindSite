@@ -111,12 +111,22 @@ footer {
 }
 
 .linline {
-	display: inline-block;
-	padding-right: 15px;
+	float: left;
+	clear: left;
+	padding-left: 45px;
 }
 .rinline {
-	display: inline-block;
-	padding-left: 15px;
+	clear: right;
+	float: right;
+	padding-right: 45px;
+}
+
+#des {
+	clear: both;
+}
+
+#capbrow {
+	text-transform: capitalize;
 }
 
 .deleteb {
