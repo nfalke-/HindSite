@@ -1,31 +1,39 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>`
+    <link rel="stylesheet" type="text/css" href="/static/hindcss.css" >
     <script>
-        function make_test_row(row){
-            $row = $('<tr/>');
-            $row.append($('<td/>').html($('<a/>').attr('href', '/suites/{{suite_id}}/tests/'+row.id).text(row.name)))
-            $row.append($('<td/>').text(row.passed))
-            $row.append($('<td/>').text(row.screenshot_passed))
-            $row.append($('<td/>').text(row.last_ran))
-            $row.append($('<td/>').append(
-                $('<button/>').text('x').click(
-                    function() {
-                        $.get('/suites/{{suite_id}}/tests/'+row.id+'/delete/')
-                        update()
-                    }
-                )
-            ))
+        function make_row(row){
+            $button = $('<button/>').text('x').click(
+                function() {
+                    $.get('/suites/'+row.id+'/delete/')
+                    update()
+                }
+            ).attr("class", "deleteb")
+
+            $lastRan = $('<div/>').text(row.last_ran)
+            $name = $('<a/>').attr('href', '/suites/{{suite_id}}/tests/'+row.id).text(row.name)
+            $testPassed = $('<div/>').text('Test Passed: ' + row.passed)
+            $screenshotPassed = $('<div/>').text('Screenshot Passed' + row.screenshot_passed)
+
+
+            $row = $('<div/>').attr('class', 'suite'); 
+            $top = $('<div/>').html($name)
+            $top.append($button)
+            $row.append($top)
+
+            $row.append($testPassed)
+            $row.append($screenshotPassed)
+
             return $row
         }
 
-        function make_table(data, id, make_row) {
-            $table = $('<tbody>').attr("id", id)
+        function make_divs(data) {
+            $table = $('<div>').attr("id", "suites")
             data.forEach(function(row) {
                 $table.append(make_row(row))
             })
             return $table
         }
-
         function make_select(data, select_id, select_name, default_option) {
             $select = $('<select/>').attr('id', select_id).attr('name', select_name)
             $select.append($('<option\>').attr('value', 0).text(default_option))
@@ -35,9 +43,11 @@
             return $select
         }
 
+
         function update() {
             $.get("/suites/{{suite_id}}/data/", function(data) {
-                $('#tests').replaceWith(make_table(data, "tests", make_test_row));
+                $('#suites').replaceWith(make_divs(data));
+                $('#suite_select').replaceWith(make_select(data));
             })
             $.get("/suites/{{suite_id}}/copy/data/", function(data) {
                 console.log(data)
@@ -52,39 +62,39 @@
 </head>
 
 <body bgcolor="#D0D0D0">
-    <center>
-        <a href='/suites/{{suite_id}}/tests/add'>New Test</a><br>
-        <a href='/suites/{{suite_id}}/edit'>Edit Suite</a><br>
+    <div id="header">
+        <p id="name"><a href="/">H i n d S i t e</a></p>
+            <ul id="nav1">
+                <li><a href="/">Suites</a></li>
+                <li ><a href="placeholder/IHaventMadeThisPage.html">About</a></li>
+            </ul>
+        <center><img src="/static/images/logobase.png" id="logo" /></center>
+    </div>
+    <div id="main">
+        <a href='/suites/{{suite_id}}/tests/add' id="newsuite">New Test</a><br>
+        <a href='/suites/{{suite_id}}/edit' id='newsuite'>Edit Suite</a><br>
         {% if tests %}
             <input type="button" value='run suite'
              onclick="$.get('/suites/{{suite_id}}/run/')">
             <br>
         {% endif %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <td>tests</td>
-                    <td>passed</td>
-                    <td>screenshot passed</td>
-                    <td>last ran</td>
-                    <td>delete</td>
-                </tr>
-            </thead>
-            <tbody id='tests'></tbody>
-        </table>
+        <center>
+            <div id="suites">
+            </div>
+        </center>
 
-        <h3>Copy Test</h3>
+        <p id="copys">Copy Test</p>
         <form method=post enctype=multipart/form-data action=/suites/{{suite_id}}/tests/copy/>
             <select name="test" id="test_to_copy">
                 <option value=0>Test Name</option>
             </select>
             <select name="suite" id="suite_to_copy_to">
                 <option value=0>Suite Name</option>
-                {% for suite_name, suite_id, description, browser, width, height in suites %}
-                    <option value="{{suite_id}}">{{suite_name}}</option>
-                {% endfor %}
             </select>
             <input type=submit value=Copy>
         </form>
-    </center>
+    </div>
+    <footer>
+            <p id="copyright">HindSite by Nate Falke, Codi Shanks 2017</p>
+    </footer>
 </body>
