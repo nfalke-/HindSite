@@ -11,7 +11,7 @@
                 }
             ).attr("class", "deleteb")
             $name = $('<a/>').attr('href', '/suites/'+row.id).text(row.name).attr("class", "suitename")
-			$lastRan = $('<div/>').text("Last Ran: " + row.last_ran).attr("id", "lastran")
+            $lastRan = $('<div/>').text("Last Ran: " + row.last_ran).attr("id", "lastran")
             $browser = $('<div/>').text(row.browser).attr("class", "linline").attr("id", "capbrow")
             $dims = $('<div/>').text(row.width+'x'+row.height).attr("class", "rinline")
             $description = $('<div/>').text("Description: " + row.description).attr("id", "des")
@@ -23,12 +23,12 @@
             $top = $('<div/>').html($name)
             $top.append($button)
             $row.append($top)
-			$row.append($lastRan)
+            $row.append($lastRan)
             $settings = $('<div/>')
             $settings.append($browser)
             $settings.append($dims)
             $row.append($settings)
-			$row.append($testCount)
+            $row.append($testCount)
             $row.append($failCount)
             $row.append($description)
 
@@ -86,6 +86,6 @@
         </form>
     </div>
 	<footer>
-		<p id="copyright">HindSite © Nate Falke, 2017</p>
+		<p id="copyright">HindSite by Nate Falke, 2017</p>
 	</footer>
 </body>
