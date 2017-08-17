@@ -1,9 +1,25 @@
 /*wooo main CSS*/
 /*#0d1b11 = dgreen, #226034 = lgreen, #cfd8d0 = lgrey, #aaaaaa = dgrey #bec2be = newgrey*/
 /*things to fix: delete button in top corner, please capitalize browser names, button image, inline spacing, possibly lighten colors*/
+
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
 body {
 	background-color: #cfd8d0;
 	font-family: "Trebuchet MS", Helvetica, sans-serif;
+        position: relative;
+        margin: 0;
+        min-height: 100%;
 	padding-bottom: 30px;
 }
 
@@ -12,12 +28,13 @@ a {
 }
 
 #main {
+        padding-top: 64px;
+        text-align: center;
+        clear: both;
 	text-align: center;
-	clear: both;
 	position: relative;
-	top: 80px;
 	min-width: 500px;
-	padding-bottom: 20px;
+        margin: 0 auto;
 }
 
 #header {
@@ -33,15 +50,15 @@ a {
 	z-index: 200;
 }
 
-footer {
-	background-color: #0d1b11;
-	height: 12px;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	min-width: 500px;
-	padding-bottom: 18px;
+.footer {
+        height:20px;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding-bottom: 18px;
+        background-color: #0d1b11;
+        text-align: center;
 }
 
 #copyright {
