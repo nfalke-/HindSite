@@ -1,4 +1,5 @@
 <head>
+    <link rel="stylesheet" type="text/css" href="/static/hindcss.css" >
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>`
     <script>
         function make_step_row(row){
@@ -11,6 +12,25 @@
         }
 
         function make_run_row(row){
+            $row = $('<div/>').attr('class', 'suite'); 
+            $start = $('<a/>')
+                .attr('href', '/suites/{{suite_id}}/tests/{{test_id}}/runs/'+row.id)
+                .attr("class", "suitename")
+                .text(row.start)
+            $end = $('<div/>')
+                .text(row.end)
+            $passed = $('<div/>')
+                .text(row.passed)
+            $screenshot_passed = $('<div/>')
+                .text(row.screenshot_passed)
+            $row.append($start)
+            $row.append($end)
+            $row.append($passed)
+            $row.append($screenshot_passed)
+            return $row
+        }
+
+        function make_run_rows(row){
             $row = $('<tr/>');
             $row.append($('<td/>').html($('<a/>')
                 .attr('href', '/suites/{{suite_id}}/tests/{{test_id}}/runs/'+row.id)
@@ -31,8 +51,13 @@
 
         function update() {
             $.get("/suites/{{suite_id}}/tests/{{test_id}}/data/", function(data) {
-                $('#steps').replaceWith(make_table(data.steps, "steps", make_step_row));
-                $('#runs').replaceWith(make_table(data.runs, "runs", make_run_row));
+                $('#steps').replaceWith(
+                    make_table(data.steps, "steps", make_step_row));
+                console.log(data.runs)
+                $('#suite').replaceWith(
+                    make_table([data.runs[0]], "suite", make_run_row));
+                $('#runs').replaceWith(
+                    make_table(data.runs.slice(1), "runs", make_run_rows));
             })
             setTimeout(update, 30000)
         }
@@ -42,37 +67,53 @@
 </head>
 
 <body bgcolor="#D0D0D0">
-    <center>
-        <table border="1">
-            {% if steps %}
-                <input type="button" value='run test'
-                 onclick="$.get('/suites/{{suite_id}}/tests/{{test_id}}/run/'); update()">
-                <br>
-            {% endif %}
-            <a href="/suites/{{suite_id}}/tests/{{test_id}}/edit/">edit test</a>
+    <div id="header">
+        <p id="name"><a href="/">H i n d S i t e</a></p>
+        <ul id="nav1">
+            <li><a href="/">Suites</a></li>
+            <li><a href="placeholder/IHaventMadeThisPage.html">About</a></li>
+        </ul>
+        <center><img src="/static/images/logobase.png" id="logo" /></center>
+    </div>
+    <div id="main">
+        <center>
+            <table border="1">
+                {% if steps %}
+                    <input type="button" value='run test'
+                        onclick="$.get('/suites/{{suite_id}}/tests/{{test_id}}/run/'); update()">
+                    <br>
+                {% endif %}
+                <a href="/suites/{{suite_id}}/tests/{{test_id}}/edit/">edit test</a>
 
-            <thead>
-                <tr>
-                    <td>Action</td>
-                    <td>Arguments</td>
-                    <td>Take Screenshot</td>
-                    <td>Diff Threshold</td>
-                </tr>
-            </thead>
-            <tbody id="steps"> </tbody>
-        </table>
+                <p id="copys">steps</p>
+                <thead>
+                    <tr>
+                        <td>Action</td>
+                        <td>Arguments</td>
+                        <td>Take Screenshot</td>
+                        <td>Diff Threshold</td>
+                    </tr>
+                </thead>
+                <tbody id="steps"> </tbody>
+            </table>
 
-        <H3>Previous Runs</H3>
-        <table border="1">
-            <thead>
-                <tr>
-                    <td>start</td>
-                    <td>end</td>
-                    <td>passed</td>
-                    <td>screenshot_passed</td>
-                </tr>
-            </thead>
-            <tbody id=runs> </tbody>
-        </table>
-    </center>
+            <p id="copys">Current Run</p>
+            <div id='suite'></div>
+            <p id="copys">Previous Runs</p>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <td>start</td>
+                        <td>end</td>
+                        <td>passed</td>
+                        <td>screenshot_passed</td>
+                    </tr>
+                </thead>
+                <tbody id=runs> </tbody>
+            </table>
+        </center>
+    </div>
+    <div class="footer">
+            <div id="copyright">HindSite by Nate Falke, 2017</p>
+    </div>
 </body>
