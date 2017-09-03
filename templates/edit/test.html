@@ -1,68 +1,34 @@
 <head>
+    <link rel="stylesheet" type="text/css" href="/static/hindcss.css" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/static/edit_test.js"></script>
+    <script>
+        update({{suite_id}}, {{test_id}})
+    </script>
 </head>
 <body bgcolor="#D0D0D0">
-    <center>
-        <div id="StepTableDiv">
-            <form method=post enctype=multipart/form-data
-             onsubmit="activateAll()" action="{{ url_for('post_edit_test', suite_id=suite_id, test_id=test_id) }}">
-                <span>
-                    Name:
-                    <input size=40 type="text" name="name" placeholder="test name" value="{{name}}"/>
-                </span>
-                <table id="StepTable" border="1">
-                    <thead>
-                        <tr>
-                            <td>Step Number</td>
-                            <td>Action</td>
-                            <td>Arguments</td>
-                            <td>Take Screenshot</td>
-                            <td>Screenshot Name</td>
-                            <td>Threshold</td>
-                            <td>Add Row Below</td>
-                            <td>Delete</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for stepnumber, action, optional, args, screenshot, screenshot_name, threshold in steps %}
-                            <tr>
-                                <td>{{stepnumber}}</td>
-                                <td>
-                                    <select name="action">
-                                        <option value="visit">Visit</option>
-                                        <option value="click"
-                                         {% if action == 'click' %} selected {% endif %}>Click</option>
-                                        <option value="input" 
-                                         {% if action == 'input' %} selected {% endif %}>Input</option>
-                                        <option value="sleep"
-                                         {% if action == 'sleep' %} selected {% endif %}>Sleep</option>
-                                        <option value="refresh"
-                                         {% if action == 'refresh' %} selected {% endif %}>Refresh</option>
-                                        <option value="execute"
-                                         {% if action == 'execute' %} selected {% endif %}>Execute Javascript</option>
-                                        <option value="assert"
-                                         {% if action == 'assert' %} selected {% endif %}>Assert Exists</option>
-                                    </select>
-                                </td>
-                                <td><input size=40 type="text" name="arguments"
-                                           placeholder="arguments" value="{{args}}"/></td>
-                                <td><input type="checkbox" name="screenshot"
-                                           {% if screenshot %} checked {% endif %}
-                                           value="{{stepnumber}}" /></td>
-                                <td><input size=40 type="text" name="screenshot_name"
-                                           placeholder="screenshot name" value="{{screenshot_name}}"/></td>
-                                <td><input size=40 type="text" name="threshold"
-                                           placeholder="diff threshold" value="{{threshold}}"/></td>
-                                <td><input type="button" id="AddRowButton"
-                                           value="New Row Below" onclick="insRow(this)"/></td>
-                                <td><input type="button" id="DelRowButton"
-                                           value="Delete" onclick="deleteRow(this)"/></td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <input type=submit value=Submit >
-            </form>
-        </div>
-    <script src="/static/addrows.js"></script>
-    </center>
+    <div id="header">
+        <p id="name"><a href="/">H i n d S i t e</a></p>
+            <ul id="nav1">
+                <li><a href="/">Suites</a></li>
+                <li ><a href="placeholder/IHaventMadeThisPage.html">About</a></li>
+            </ul>
+        <center><img src="/static/images/logobase.png" id="logo" /></center>
+    </div>
+    <div id="main">
+        <form method=post enctype=multipart/form-data
+         action="{{ url_for('post_edit_test', suite_id=suite_id, test_id=test_id) }}">
+            <span>
+                Name:
+                <input size=40 type="text" name="name" placeholder="test name" value="{{name}}"/>
+            </span>
+            <center>
+            <div id="suites"> </div>
+            </center>
+            <input type=submit value=Submit >
+        </form>
+    </div>
+    <div class='footer'>
+        <div id="copyright">HindSite by Nate Falke, Codi Shanks 2017</p>
+    </div>
 </body>
