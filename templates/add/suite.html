@@ -1,38 +1,39 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/hindcss.css" >
+</head>
 <body bgcolor="#D0D0D0">
-    <center>
-        <form method=post enctype=multipart/form-data action="{{ url_for('post_add_suite') }}">
-            <table id="SuiteTable" border="1">
-                <thead>
-                    <tr>
-                        <td>Suite Name</td>
-                        <td>Description</td>
-                        <td>Browser</td>
-                        <td>width</td>
-                        <td>height</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input name="suitename"></td>
-                        <td>
-                            <textarea name="description" cols="30"></textarea>
-                        </td>
-                        <td>
-                            <select name="browser">
-                                <option value="chrome">Chrome</option>
-                                <option value="firefox">Firefox</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input name="width" value=1920>
-                        </td>
-                        <td>
-                            <input name="height" value=1080>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <input type=submit value=Submit >
-        </form>
-    </center>
+    <div id="header">
+        <p id="name"><a href="/">H i n d S i t e</a></p>
+        <ul id="nav1">
+            <li><a href="/">Suites</a></li>
+            <li><a href="/placeholder/IHaventMadeThisPage.html">About</a></li>
+        </ul>
+        <center><img src="/static/images/logobase.png" id="logo" /></center>
+    </div>
+    <div id="main">
+        <center>
+            <form method=post enctype=multipart/form-data action="{{ url_for('post_add_suite') }}">
+                <div class=suite>
+                    <label for="suitename">Suite Name </label>
+                    <input id="suitename" name="suitename">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" cols="30"></textarea>
+                    <label for="browser">Browser</label>
+                    <select id="browser" name="browser">
+                        <option value="chrome">Chrome</option>
+                        <option value="firefox">Firefox</option>
+                    </select>
+                    <label for="width">Width</label>
+                    <input id="width" name="width" value=1920>
+                    <label for="height">height</label>
+                    <input id="height" name="height" value=1080>
+                </div>
+                <input type=submit value=Submit >
+                <input type="button" onclick="history.back();" value="Back">
+            </form>
+        </center>
+    </div>
+    <div class="footer">
+        <div id="copyright">HindSite by Nate Falke, Codi Shanks 2017</p>
+    </div>
 </body>
